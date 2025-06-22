@@ -1,0 +1,7 @@
+Esercizio
+
+Scrivere due programmi che scrivano dei caratteri casuali in istanti casuali in una
+memoria condivisa tra i due processi che li eseguono. Per evitare race conditions nella
+scrittura della zona di memoria condivisa, si utilizzino dei segnali (es. USR1 e USR2)
+facendo in modo che in ciascuno dei due processi esista una thread deputata alla gestione 
+dei segnali.

@@ -11,8 +11,9 @@
 8. [File I/O](#file-io)
 9. [Gestione Tempo](#gestione-tempo)
 10. [Allocazione Dinamica](#allocazione-dinamica)
-11. [Preprocessore](#preprocessore)
-12. [Esempi Pratici](#esempi-pratici)
+11. [**Liste Concatenate**](#liste-concatenate) ⭐ **NUOVO**
+12. [Preprocessore](#preprocessore)
+13. [Esempi Pratici](#esempi-pratici)
 
 ---
 
@@ -1047,6 +1048,744 @@ int main() {
 
 ---
 
+## LISTE CONCATENATE
+
+### Lista Concatenata Base (con puntatori)
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+// Nodo della lista
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Crea nuovo nodo
+Node* crea_nodo(int data) {
+    Node* nuovo = malloc(sizeof(Node));
+    if (nuovo != NULL) {
+        nuovo->data = data;
+        nuovo->next = NULL;
+    }
+    return nuovo;
+}
+
+// Inserisce all'inizio
+Node* inserisci_inizio(Node* head, int data) {
+    Node* nuovo = crea_nodo(data);
+    if (nuovo != NULL) {
+        nuovo->next = head;
+        head = nuovo;
+    }
+    return head;
+}
+
+// Inserisce alla fine
+Node* inserisci_fine(Node* head, int data) {
+    Node* nuovo = crea_nodo(data);
+    if (nuovo == NULL) return head;
+    
+    if (head == NULL) {
+        return nuovo;
+    }
+    
+    Node* current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->next = nuovo;
+    
+    return head;
+}
+
+// Rimuovi primo elemento
+Node* rimuovi_primo(Node* head) {
+    if (head == NULL) return NULL;
+    
+    Node* nuovo_head = head->next;
+    free(head);
+    return nuovo_head;
+}
+
+// Cerca elemento
+Node* cerca(Node* head, int data) {
+    Node* current = head;
+    while (current != NULL) {
+        if (current->data == data) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+// Conta elementi
+int conta_elementi(Node* head) {
+    int count = 0;
+    Node* current = head;
+    while (current != NULL) {
+        count++;
+        current = current->next;
+    }
+    return count;
+}
+
+// Stampa lista
+void stampa_lista(Node* head) {
+    printf("Lista: ");
+    Node* current = head;
+    while (current != NULL) {
+        printf("%d", current->data);
+        if (current->next != NULL) {
+            printf(" -> ");
+        }
+        current = current->next;
+    }
+    printf(" -> NULL\n");
+}
+
+// Libera tutta la lista
+void libera_lista(Node* head) {
+    while (head != NULL) {
+        Node* temp = head;
+        head = head->next;
+        free(temp);
+    }
+}
+
+int main() {
+    Node* lista = NULL;
+    
+    printf("=== LISTA CONCATENATA BASE ===\n");
+    
+    // Inserimenti
+    lista = inserisci_inizio(lista, 10);
+    lista = inserisci_inizio(lista, 20);
+    lista = inserisci_fine(lista, 5);
+    stampa_lista(lista);  // 20 -> 10 -> 5 -> NULL
+    
+    // Conta elementi
+    printf("Elementi: %d\n", conta_elementi(lista));
+    
+    // Cerca elemento
+    Node* trovato = cerca(lista, 10);
+    if (trovato) {
+        printf("Elemento 10 trovato!\n");
+    }
+    
+    // Rimuovi primo
+    lista = rimuovi_primo(lista);
+    stampa_lista(lista);  // 10 -> 5 -> NULL
+    
+    // Libera memoria
+    libera_lista(lista);
+    
+    return 0;
+}
+```
+
+### Lista Concatenata in Memoria Condivisa (con offset)
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <semaphore.h>
+
+#define MAX_NODES 100
+#define SHM_NAME "/lista_condivisa"
+
+// Nodo con offset invece di puntatori
+typedef struct {
+    int data;
+    int next_offset;  // ⭐ Offset invece di puntatore!
+    int is_free;      // Per gestire allocazione
+} Node;
+
+// Memoria condivisa
+typedef struct {
+    Node nodes[MAX_NODES];
+    int head_offset;      // Offset del primo nodo (-1 se vuota)
+    int count;           // Numero elementi
+    sem_t mutex;         // Sincronizzazione
+} SharedList;
+
+// Converte offset in puntatore
+Node* get_node(SharedList* list, int offset) {
+    if (offset == -1 || offset >= MAX_NODES) return NULL;
+    return &list->nodes[offset];
+}
+
+// Converte puntatore in offset
+int get_offset(SharedList* list, Node* node) {
+    if (node == NULL) return -1;
+    return node - list->nodes;
+}
+
+// Alloca nuovo nodo dal pool
+int alloca_nodo(SharedList* list) {
+    for (int i = 0; i < MAX_NODES; i++) {
+        if (list->nodes[i].is_free) {
+            list->nodes[i].is_free = 0;
+            list->nodes[i].next_offset = -1;
+            return i;
+        }
+    }
+    return -1;  // Nessun nodo disponibile
+}
+
+// Libera nodo
+void libera_nodo(SharedList* list, int offset) {
+    if (offset >= 0 && offset < MAX_NODES) {
+        list->nodes[offset].is_free = 1;
+        list->nodes[offset].next_offset = -1;
+    }
+}
+
+// Inserisce all'inizio (thread-safe)
+int inserisci_inizio_safe(SharedList* list, int data) {
+    sem_wait(&list->mutex);
+    
+    int new_offset = alloca_nodo(list);
+    if (new_offset == -1) {
+        sem_post(&list->mutex);
+        return -1;  // Errore
+    }
+    
+    Node* nuovo = &list->nodes[new_offset];
+    nuovo->data = data;
+    nuovo->next_offset = list->head_offset;
+    
+    list->head_offset = new_offset;
+    list->count++;
+    
+    sem_post(&list->mutex);
+    return new_offset;
+}
+
+// Rimuove primo elemento (thread-safe)
+int rimuovi_primo_safe(SharedList* list) {
+    sem_wait(&list->mutex);
+    
+    if (list->head_offset == -1) {
+        sem_post(&list->mutex);
+        return -1;  // Lista vuota
+    }
+    
+    Node* head = get_node(list, list->head_offset);
+    int data = head->data;
+    int old_head = list->head_offset;
+    
+    list->head_offset = head->next_offset;
+    list->count--;
+    
+    libera_nodo(list, old_head);
+    
+    sem_post(&list->mutex);
+    return data;
+}
+
+// Conta elementi (thread-safe)
+int conta_safe(SharedList* list) {
+    sem_wait(&list->mutex);
+    int count = list->count;
+    sem_post(&list->mutex);
+    return count;
+}
+
+// Stampa lista (thread-safe)
+void stampa_lista_safe(SharedList* list, const char* nome_processo) {
+    sem_wait(&list->mutex);
+    
+    printf("%s: Lista [", nome_processo);
+    int current_offset = list->head_offset;
+    
+    while (current_offset != -1) {
+        Node* current = get_node(list, current_offset);
+        printf("%d", current->data);
+        current_offset = current->next_offset;
+        if (current_offset != -1) printf(" -> ");
+    }
+    
+    printf("] (count: %d)\n", list->count);
+    
+    sem_post(&list->mutex);
+}
+
+// Inizializza lista condivisa
+SharedList* crea_lista_condivisa() {
+    // Rimuovi memoria precedente
+    shm_unlink(SHM_NAME);
+    
+    // Crea memoria condivisa
+    int shm_fd = shm_open(SHM_NAME, O_CREAT | O_RDWR, 0666);
+    if (shm_fd == -1) return NULL;
+    
+    if (ftruncate(shm_fd, sizeof(SharedList)) == -1) {
+        close(shm_fd);
+        return NULL;
+    }
+    
+    // Mappa memoria
+    SharedList* list = mmap(NULL, sizeof(SharedList), 
+                           PROT_READ | PROT_WRITE, 
+                           MAP_SHARED, shm_fd, 0);
+    if (list == MAP_FAILED) {
+        close(shm_fd);
+        return NULL;
+    }
+    
+    // Inizializza
+    list->head_offset = -1;
+    list->count = 0;
+    
+    // Inizializza pool nodi
+    for (int i = 0; i < MAX_NODES; i++) {
+        list->nodes[i].is_free = 1;
+        list->nodes[i].next_offset = -1;
+    }
+    
+    // Inizializza semaforo
+    sem_init(&list->mutex, 1, 1);
+    
+    close(shm_fd);
+    return list;
+}
+
+// Apre lista condivisa esistente
+SharedList* apri_lista_condivisa() {
+    int shm_fd = shm_open(SHM_NAME, O_RDWR, 0666);
+    if (shm_fd == -1) return NULL;
+    
+    SharedList* list = mmap(NULL, sizeof(SharedList), 
+                           PROT_READ | PROT_WRITE, 
+                           MAP_SHARED, shm_fd, 0);
+    close(shm_fd);
+    
+    if (list == MAP_FAILED) return NULL;
+    return list;
+}
+
+// Chiude lista condivisa
+void chiudi_lista_condivisa(SharedList* list, int rimuovi) {
+    if (list) {
+        if (rimuovi) {
+            sem_destroy(&list->mutex);
+            shm_unlink(SHM_NAME);
+        }
+        munmap(list, sizeof(SharedList));
+    }
+}
+
+int main() {
+    printf("=== LISTA CONCATENATA IN MEMORIA CONDIVISA ===\n");
+    
+    // Processo padre crea la lista
+    SharedList* lista = crea_lista_condivisa();
+    if (!lista) {
+        printf("Errore creazione lista condivisa!\n");
+        return 1;
+    }
+    
+    pid_t pid = fork();
+    
+    if (pid == 0) {
+        // === PROCESSO FIGLIO ===
+        printf("\n🟢 FIGLIO avviato\n");
+        
+        inserisci_inizio_safe(lista, 10);
+        stampa_lista_safe(lista, "FIGLIO");
+        
+        inserisci_inizio_safe(lista, 20);
+        stampa_lista_safe(lista, "FIGLIO");
+        
+        printf("🟢 FIGLIO: Elementi totali: %d\n", conta_safe(lista));
+        
+        chiudi_lista_condivisa(lista, 0);  // Non rimuovere
+        exit(0);
+        
+    } else {
+        // === PROCESSO PADRE ===
+        printf("\n🟡 PADRE avviato\n");
+        
+        sleep(1);  // Lascia lavorare il figlio
+        
+        inserisci_inizio_safe(lista, 30);
+        stampa_lista_safe(lista, "PADRE");
+        
+        int rimosso = rimuovi_primo_safe(lista);
+        printf("🟡 PADRE: Rimosso elemento: %d\n", rimosso);
+        stampa_lista_safe(lista, "PADRE");
+        
+        wait(NULL);  // Aspetta figlio
+        
+        printf("\n=== STATO FINALE ===\n");
+        stampa_lista_safe(lista, "FINALE");
+        
+        chiudi_lista_condivisa(lista, 1);  // Rimuovi memoria
+    }
+    
+    return 0;
+}
+```
+
+### Lista Bidirezionale
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+// Nodo bidirezionale
+typedef struct DNode {
+    int data;
+    struct DNode* next;
+    struct DNode* prev;
+} DNode;
+
+// Struttura lista bidirezionale
+typedef struct {
+    DNode* head;
+    DNode* tail;
+    int count;
+} DoublyLinkedList;
+
+// Inizializza lista
+DoublyLinkedList* crea_lista_bidirezionale() {
+    DoublyLinkedList* lista = malloc(sizeof(DoublyLinkedList));
+    if (lista) {
+        lista->head = NULL;
+        lista->tail = NULL;
+        lista->count = 0;
+    }
+    return lista;
+}
+
+// Crea nuovo nodo
+DNode* crea_nodo_bidir(int data) {
+    DNode* nuovo = malloc(sizeof(DNode));
+    if (nuovo) {
+        nuovo->data = data;
+        nuovo->next = NULL;
+        nuovo->prev = NULL;
+    }
+    return nuovo;
+}
+
+// Inserisce all'inizio
+void inserisci_inizio_bidir(DoublyLinkedList* lista, int data) {
+    DNode* nuovo = crea_nodo_bidir(data);
+    if (!nuovo || !lista) return;
+    
+    if (lista->head == NULL) {
+        // Lista vuota
+        lista->head = nuovo;
+        lista->tail = nuovo;
+    } else {
+        nuovo->next = lista->head;
+        lista->head->prev = nuovo;
+        lista->head = nuovo;
+    }
+    
+    lista->count++;
+}
+
+// Inserisce alla fine
+void inserisci_fine_bidir(DoublyLinkedList* lista, int data) {
+    DNode* nuovo = crea_nodo_bidir(data);
+    if (!nuovo || !lista) return;
+    
+    if (lista->tail == NULL) {
+        // Lista vuota
+        lista->head = nuovo;
+        lista->tail = nuovo;
+    } else {
+        nuovo->prev = lista->tail;
+        lista->tail->next = nuovo;
+        lista->tail = nuovo;
+    }
+    
+    lista->count++;
+}
+
+// Rimuove nodo specifico
+void rimuovi_nodo_bidir(DoublyLinkedList* lista, DNode* nodo) {
+    if (!lista || !nodo) return;
+    
+    // Aggiorna puntatori
+    if (nodo->prev) {
+        nodo->prev->next = nodo->next;
+    } else {
+        lista->head = nodo->next;  // Era il primo
+    }
+    
+    if (nodo->next) {
+        nodo->next->prev = nodo->prev;
+    } else {
+        lista->tail = nodo->prev;  // Era l'ultimo
+    }
+    
+    free(nodo);
+    lista->count--;
+}
+
+// Stampa avanti
+void stampa_avanti(DoublyLinkedList* lista) {
+    printf("Avanti: ");
+    DNode* current = lista->head;
+    while (current) {
+        printf("%d", current->data);
+        if (current->next) printf(" <-> ");
+        current = current->next;
+    }
+    printf(" | count: %d\n", lista->count);
+}
+
+// Stampa indietro
+void stampa_indietro(DoublyLinkedList* lista) {
+    printf("Indietro: ");
+    DNode* current = lista->tail;
+    while (current) {
+        printf("%d", current->data);
+        if (current->prev) printf(" <-> ");
+        current = current->prev;
+    }
+    printf("\n");
+}
+
+// Libera lista bidirezionale
+void libera_lista_bidir(DoublyLinkedList* lista) {
+    if (!lista) return;
+    
+    DNode* current = lista->head;
+    while (current) {
+        DNode* next = current->next;
+        free(current);
+        current = next;
+    }
+    
+    free(lista);
+}
+
+int main() {
+    printf("=== LISTA BIDIREZIONALE ===\n");
+    
+    DoublyLinkedList* lista = crea_lista_bidirezionale();
+    
+    // Inserimenti
+    inserisci_inizio_bidir(lista, 20);
+    inserisci_inizio_bidir(lista, 10);
+    inserisci_fine_bidir(lista, 30);
+    inserisci_fine_bidir(lista, 40);
+    
+    stampa_avanti(lista);   // 10 <-> 20 <-> 30 <-> 40
+    stampa_indietro(lista); // 40 <-> 30 <-> 20 <-> 10
+    
+    // Rimuovi elemento centrale
+    DNode* current = lista->head->next;  // Secondo elemento (20)
+    rimuovi_nodo_bidir(lista, current);
+    
+    stampa_avanti(lista);   // 10 <-> 30 <-> 40
+    
+    libera_lista_bidir(lista);
+    return 0;
+}
+```
+
+### Operazioni Avanzate su Liste
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Inserimento ordinato
+Node* inserisci_ordinato(Node* head, int data) {
+    Node* nuovo = malloc(sizeof(Node));
+    if (!nuovo) return head;
+    
+    nuovo->data = data;
+    nuovo->next = NULL;
+    
+    // Se lista vuota o nuovo è il più piccolo
+    if (head == NULL || head->data > data) {
+        nuovo->next = head;
+        return nuovo;
+    }
+    
+    // Trova posizione corretta
+    Node* current = head;
+    while (current->next != NULL && current->next->data < data) {
+        current = current->next;
+    }
+    
+    nuovo->next = current->next;
+    current->next = nuovo;
+    
+    return head;
+}
+
+// Rimuovi duplicati (lista ordinata)
+Node* rimuovi_duplicati(Node* head) {
+    if (head == NULL) return head;
+    
+    Node* current = head;
+    while (current->next != NULL) {
+        if (current->data == current->next->data) {
+            Node* temp = current->next;
+            current->next = current->next->next;
+            free(temp);
+        } else {
+            current = current->next;
+        }
+    }
+    
+    return head;
+}
+
+// Inverti lista
+Node* inverti_lista(Node* head) {
+    Node* prev = NULL;
+    Node* current = head;
+    Node* next = NULL;
+    
+    while (current != NULL) {
+        next = current->next;  // Salva prossimo
+        current->next = prev;  // Inverti puntatore
+        prev = current;        // Avanza prev
+        current = next;        // Avanza current
+    }
+    
+    return prev;  // Nuovo head
+}
+
+// Trova il middle (algoritmo two pointers)
+Node* trova_middle(Node* head) {
+    if (head == NULL) return NULL;
+    
+    Node* slow = head;
+    Node* fast = head;
+    
+    while (fast->next != NULL && fast->next->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    
+    return slow;
+}
+
+// Rileva ciclo (algoritmo Floyd)
+int ha_ciclo(Node* head) {
+    if (head == NULL) return 0;
+    
+    Node* slow = head;
+    Node* fast = head;
+    
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+        
+        if (slow == fast) {
+            return 1;  // Ciclo rilevato
+        }
+    }
+    
+    return 0;  // Nessun ciclo
+}
+
+// Merge di due liste ordinate
+Node* merge_liste_ordinate(Node* l1, Node* l2) {
+    Node dummy = {0, NULL};
+    Node* tail = &dummy;
+    
+    while (l1 != NULL && l2 != NULL) {
+        if (l1->data <= l2->data) {
+            tail->next = l1;
+            l1 = l1->next;
+        } else {
+            tail->next = l2;
+            l2 = l2->next;
+        }
+        tail = tail->next;
+    }
+    
+    // Aggiungi elementi rimanenti
+    if (l1 != NULL) tail->next = l1;
+    if (l2 != NULL) tail->next = l2;
+    
+    return dummy.next;
+}
+
+// Utility: stampa lista
+void stampa_lista_util(Node* head) {
+    while (head) {
+        printf("%d ", head->data);
+        head = head->next;
+    }
+    printf("\n");
+}
+
+// Utility: crea nodo
+Node* crea_nodo_util(int data) {
+    Node* nuovo = malloc(sizeof(Node));
+    if (nuovo) {
+        nuovo->data = data;
+        nuovo->next = NULL;
+    }
+    return nuovo;
+}
+
+int main() {
+    printf("=== OPERAZIONI AVANZATE SU LISTE ===\n");
+    
+    // Test inserimento ordinato
+    Node* lista = NULL;
+    lista = inserisci_ordinato(lista, 30);
+    lista = inserisci_ordinato(lista, 10);
+    lista = inserisci_ordinato(lista, 20);
+    lista = inserisci_ordinato(lista, 40);
+    lista = inserisci_ordinato(lista, 20);  // Duplicato
+    
+    printf("Lista ordinata: ");
+    stampa_lista_util(lista);
+    
+    // Rimuovi duplicati
+    lista = rimuovi_duplicati(lista);
+    printf("Senza duplicati: ");
+    stampa_lista_util(lista);
+    
+    // Trova middle
+    Node* middle = trova_middle(lista);
+    printf("Elemento centrale: %d\n", middle->data);
+    
+    // Inverti lista
+    lista = inverti_lista(lista);
+    printf("Lista invertita: ");
+    stampa_lista_util(lista);
+    
+    // Test merge
+    Node* lista2 = NULL;
+    lista2 = inserisci_ordinato(lista2, 15);
+    lista2 = inserisci_ordinato(lista2, 25);
+    lista2 = inserisci_ordinato(lista2, 35);
+    
+    printf("Lista 2: ");
+    stampa_lista_util(lista2);
+    
+    Node* merged = merge_liste_ordinate(lista, lista2);
+    printf("Liste unite: ");
+    stampa_lista_util(merged);
+    
+    return 0;
+}
+```
+
+---
+
 ## PREPROCESSORE
 
 ### Macro e Define
@@ -1342,6 +2081,7 @@ gcc -O2 programma.c -o programma
 
 # Linkare librerie
 gcc programma.c -o programma -lm  # math library
+gcc programma.c -o programma -lrt -lpthread  # POSIX IPC
 
 # Compilazione multipli file
 gcc main.c matematica.c -o programma

@@ -1,0 +1,38 @@
+[Attenzione: questo è un testo codificato in UTF-8] Creare nella propria home su
+hplinux2.unisalento.it una directory denominata proprioaccount.esameSNP05
+(es.franco.esameSNP05) e svolgere l'esercizio in tale directory o, in
+alternativa, creare una directory con lo stesso nome nella propria home Mac OS
+X, svolgere gli esercizi in tale directory e, alla fine della prova, trasferirla
+nella propria home su hplinux2.unisalento.it.
+
+I programmi creati devono essere compilabili ed eseguibili sia su Mac OS X che
+su Linux. Nella directory si DEVE anche creare un file di nome "leggimi.txt" che
+descriva l'impostazione adottata per le soluzioni oltre ad eventuali commenti
+e/o osservazioni. Si fa presente che il contenuto di tale file permette spesso
+una migliore comprensione della logica seguita nello svolgimento e, di
+conseguenza, la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP05.tgz $USER.esameSNP05
+
+[ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito sulla
+macchina Linux, DOPO che la cartella proprioaccount.esameSNP05 è stata
+trasferita sulla propria home su hplinux2.unisalento.it e NON mentre è ancora
+nella propria home su Mac OS X (se in essa si è lavorato). Si raccomanda, per
+qualsiasi dubbio sullo svolgimento e la consegna del compito, di fare
+riferimento alla pagina web: http://www.liis.it/mw/index.php/LiiS:Istruzioni]
+
+
+
+Esercizio
+
+Scrivere un programma che funzioni da server UDP su due differenti porte e un
+programma che funzioni da client per tale server. Il servizio può consistere
+nella semplice visualizzazione a terminale di un carattere casuale inviato dal
+server su richiesta del client. Il client deve accedere al server con due thread
+(una per ciascuna delle due porte del server) e deve fare in modo che gli
+intervalli di tempo in cui le due thread accedono al server non siano mai,
+neanche parzialmente, sovrapposti. Per sincronizzare l'accesso al server delle
+due thread si usi un semaforo POSIX di tipo "named". Il server deve gestire gli
+accessi multipli tramite una chiamata "select".

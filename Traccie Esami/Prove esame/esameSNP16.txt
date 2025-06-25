@@ -1,0 +1,83 @@
+Testo in italiano
+
+[ATTENZIONE: questo è un testo codificato in UTF-8]
+
+Creare nella propria home su hplinux2.unisalento.it una directory denominata
+proprioaccount.esameSNP16 (es.franco.esameSNP16) e svolgere l'esercizio in tale
+directory o, in alternativa, creare una directory con lo stesso nome nella
+propria home macOS, svolgere gli esercizi in tale directory e, alla fine della
+prova, trasferirla nella propria home su hplinux2.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di makefile.
+Anche nel caso in cui non sia possibile risolvere il problema in accordo con lo
+standard, la soluzione deve comunque funzionare su Linux e macOS. Nella
+directory si DEVE anche creare un file di nome "LEGGIMI.txt" che descriva
+l'impostazione adottata per le soluzioni oltre ad eventuali commenti e/o
+osservazioni. Si fa presente che il contenuto di tale file permette spesso una
+migliore comprensione della logica seguita nello svolgimento e, di conseguenza,
+la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP16.tgz $USER.esameSNP16
+
+[ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito sulla
+macchina Linux, DOPO che la cartella proprioaccount.esameSNP16 è stata
+trasferita sulla propria home su hplinux2.unisalento.it e NON mentre è ancora
+nella propria home su macOS (se in essa si è lavorato). Si raccomanda, per
+qualsiasi dubbio sullo svolgimento e la consegna del compito, di fare
+riferimento alla pagina web: http://www.liis.it/mw/index.php/LiiS:Istruzioni]
+
+
+Esercizio
+
+Tre processi si scambiano ciclicamente tra loro, il più velocemente possibile,
+un datagramma come se fosse una palla. Misurare e confrontare la velocità di
+rotazione della palla nel caso di processi ospitati dalla stessa macchina e nel
+caso di processi ospitati in due macchine differenti. Accertarsi, con qualunque
+metodo, che in ogni istante ci sia al massimo un datagramma in circolazione nel
+sistema costituito dai tre processi.
+
+_____________________________________________________________________________
+English text
+
+[BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP16 in your home on
+hplinux2.unisalento.it (e.g. franco.esameSNP16) and solve the exercise in that
+directory or, alternatively, create a directory with the same name in your macOS
+home, and solve the exercise in that directory. Eventually, transfer it to your
+home on hplinux2.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be provided. 
+If the solution and the compliance are not possible together, the solution must 
+anyway be working both on Linux and macOS. In the same directory, a file named
+README.txt containing a description of the solution and, possibly,
+comments/observations on the choices made to solve the problem, MUST be placed. 
+Keep in mind that the file may help the reader to understand the logic you 
+adopted and to better appreciate your work.
+
+When finished, issue in your own Linux account the following command line:
+
+cd; tar cvfz $USER.esameSNP16.tgz $USER.esameSNP16
+
+[BEWARE: the command above shown must be issued in the shell running in the
+Linux machine, AFTER the folder youraccount.esameSNP16 has been transferred to
+your home on hplinux2.unisalento.it and NOT when it's still in your home on
+macOS (if you wrote the program there). For any doubt about the way to carry on
+the exercise and how to hand it in, please read the web page (still in italian,
+sorry, soon to be translated in english):
+http://www.liis.it/mw/index.php/LiiS:Istruzioni]
+
+Exercise
+
+Three processes exchange cyclically among them, as fast as possible, a datagram
+as if it were a ball. Measure and compare the rotation speed of the ball in the
+case of three processes on the same machine and in the case of three processes
+on two machines. Make sure, with a method of your choice, that at each instant
+only a datagram is travelling in the three processes' system.
+
+
+
+
+

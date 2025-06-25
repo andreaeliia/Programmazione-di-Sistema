@@ -1,0 +1,90 @@
+Testo in italiano
+
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux2.unisalento.it una directory
+denominata proprioaccount.esameSNP60 (es.franco.esameSNP60) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria
+home su hplinux2.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di
+makefile. Anche nel caso in cui non sia possibile risolvere il
+problema in accordo con lo standard, la soluzione deve comunque
+funzionare su Linux e macOS. Nella directory si DEVE anche creare un
+file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le
+soluzioni oltre ad eventuali commenti e/o osservazioni. Si fa presente
+che il contenuto di tale file permette spesso una migliore
+comprensione della logica seguita nello svolgimento e, di conseguenza,
+la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP60.tgz $USER.esameSNP60
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP60 è
+stata trasferita sulla propria home su hplinux2.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è
+lavorato) ]
+
+Esercizio
+
+Scrivere nel linguaggio C dei programmi che implementino il seguente
+sistema.
+
+Tre processi leggono a turno una parola scelta a caso dal file
+italian.txt e la depositano in una memoria condivisa separandola con uno
+spazio dalle parole precedenti.
+
+I processi sono sincronizzati in modo da massimizzare la velocità di
+rotazione e da evitare che le loro scritture si intersechino.
+
+Quando l'utente preme i tasti ^C il contenuto della memoria scritto fino
+a quel momento viene stampato al terminale da uno dei processi.
+______________________________________________________________________
+English text
+
+[BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP60 in your home on
+hplinux2.unisalento.it (e.g. franco.esameSNP60) and solve the exercise
+in that directory or, alternatively, create a directory with the same
+name in your macOS home, and solve the exercise in that directory.
+Eventually, transfer it to your home on hplinux2.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be
+provided. If the solution and the compliance are not possible together,
+the solution must anyway be working both on Linux and macOS. In the same
+directory, a file named README.txt containing a description of the
+solution and, possibly, comments/observations on the choices made to
+solve the problem, MUST be placed. Keep in mind that the file may help
+the reader to understand the logic you adopted and to better appreciate
+your work.
+
+When finished, issue in your own Linux account the following command
+line:
+
+cd; tar cvfz $USER.esameSNP60.tgz $USER.esameSNP60
+
+[ BEWARE: the command above shown must be issued in the shell running in
+the Linux machine, AFTER the folder youraccount.esameSNP60 has been
+transferred to your home on hplinux2.unisalento.it and NOT when it's
+still in your home on macOS (if you wrote the program there). For any
+doubt about the way to carry on the exercise and how to hand it in,
+please read the web page ]
+
+Exercise
+
+Write in the C language the programs needed to implement the following
+system.
+
+Three processes take turns reading a word chosen at random from the
+italian.txt file and writing it in a shared memory. Words must be
+separated by spaces and must not be interlaced. Processes are
+synchronized in a way that maximizes rotational speed and prevents
+overwriting.
+
+When the user presses the ^C keys, the memory content written up to that
+moment is printed to the terminal by one of the processes.

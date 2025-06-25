@@ -1,0 +1,84 @@
+Testo in italiano
+
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux2.unisalento.it una directory denominata
+proprioaccount.esameSNP20 (es.franco.esameSNP20) e svolgere l'esercizio in tale directory
+o, in alternativa, creare una directory con lo stesso nome nella propria home macOS,
+svolgere gli esercizi in tale directory e, alla fine della prova, trasferirla nella
+propria home su hplinux2.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di makefile. Anche nel
+caso in cui non sia possibile risolvere il problema in accordo con lo standard, la
+soluzione deve comunque funzionare su Linux e macOS. Nella directory si DEVE anche creare
+un file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le soluzioni oltre
+ad eventuali commenti e/o osservazioni. Si fa presente che il contenuto di tale file
+permette spesso una migliore comprensione della logica seguita nello svolgimento e, di
+conseguenza, la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP20.tgz $USER.esameSNP20
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito sulla macchina Linux,
+DOPO che la cartella proprioaccount.esameSNP20 è stata trasferita sulla propria home su
+hplinux2.unisalento.it e NON mentre è ancora nella propria home su macOS (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la consegna del
+compito, di fare riferimento alla pagina web: 
+http://www.liis.it/mw/index.php/LiiS:Istruzioni ]
+
+
+Esercizio
+
+Quattro thread di un processo devono realizzare una catena di montaggio che svolga le
+seguenti funzioni: la thread 1 deve generare dei numeri interi positivi casuali e
+posizionarli in una FIFO di dimensione massima fornita come parametro dalla linea di
+comando; la thread 2 deve scoprire, leggendoli dall'uscita della FIFO, se tali interi sono
+primi; la thread 3 deve spostarli in un'altra FIFO se sono primi e rimuoverli se non lo
+sono; la thread 4 deve dare allo standard output i fattori di ciascun numero non primo. Al
+momento in cui il programma viene interrotto con ^C, deve stampare la lista dei numeri
+primi trovati fino a quel momento. Le quattro thread devono operare  e sincronizzandosi in
+modo da non creare interferenze nelle aree di memoria alle quali accedono e realizzando il
+massimo livello di parallelismo possibile.
+
+_____________________________________________________________________________ 
+English text
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP20 in your home on
+hplinux2.unisalento.it (e.g. franco.esameSNP20) and solve the exercise in that directory
+or, alternatively, create a directory with the same name in your macOS home, and solve the
+exercise in that directory. Eventually, transfer it to your home on
+hplinux2.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be provided. If the
+solution and the compliance are not possible together, the solution must anyway be working
+both on Linux and macOS. In the same directory, a file named README.txt containing a
+description of the solution and, possibly, comments/observations on the choices made to
+solve the problem, MUST be placed. Keep in mind that the file may help the reader to
+understand the logic you adopted and to better appreciate your work.
+
+When finished, execute in your own Linux account the following command line:
+
+cd; tar cvfz $USER.esameSNP20.tgz $USER.esameSNP20
+
+[BEWARE: the command above shown must be issued in the shell running in the Linux machine,
+AFTER the folder youraccount.esameSNP20 has been transferred to your home on
+hplinux2.unisalento.it and NOT when it's still in your home on macOS (if you wrote the
+program there). For any doubt about the way to carry on the exercise and how to hand it
+in, please read the web page (still in italian, sorry, soon to be translated in english):
+http://www.liis.it/mw/index.php/LiiS:Istruzioni]
+
+Exercise
+
+Four threads of a process must implement an assembly line working as following: 
+thread 1 must generate random positive integer numbers and place them in a FIFO whose
+maximum size is to be provided by the command line; thread 2 must read numbers from the
+output side of the FIFO and verify whether they are prime or not; thread 3 must move the numbers
+in another FIFO if they are prime or remove them if they are not; thread 4 must print to
+the standard output the factors of each removed number. When the program is interrupted by
+^C it must print to the standard output the list of all found prime numbers. The four
+threads must operate avoiding interferences in the shared memory areas and implementing
+the highest possible level of concurrency.
+

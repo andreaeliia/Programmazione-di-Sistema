@@ -1,0 +1,63 @@
+Testo in italiano
+
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux3.unisalento.it una directory
+denominata proprioaccount.esameSNP61 (es.franco.esameSNP61) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria
+home su hplinux3.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di
+makefile. Anche nel caso in cui non sia possibile risolvere il
+problema in accordo con lo standard, la soluzione deve comunque
+funzionare su Linux e macOS. Nella directory si DEVE anche creare un
+file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le
+soluzioni oltre ad eventuali commenti e/o osservazioni. Si fa presente
+che il contenuto di tale file permette spesso una migliore
+comprensione della logica seguita nello svolgimento e, di conseguenza,
+la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP61.tgz $USER.esameSNP61
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP61 è
+stata trasferita sulla propria home su hplinux3.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la
+consegna del compito, di fare riferimento alla pagina web: 
+http://www.liis.it/mw/index.php/LiiS:Istruzioni ]
+
+Esercizio
+
+Scrivere nel linguaggio C un programma client di nome A e un programma 
+server di nome B che funzionino nel modo seguente:
+
+1) Il programma A chiede all'utente di scrivere un numero intero.
+
+2) Il programma A invia con un datagramma UDP tale numero al 
+programma B.
+
+3) Il programma B trova tutti i file presenti nei volumi montati nella
+macchina in cui gira la cui dimensione in bytes è superiore al numero 
+ricevuto e per ciascuno di essi invia il percorso assoluto in un 
+datagramma UDP al programma A, concludendo la lista con un datagramma
+contenente la scritta "end".
+
+4) Il programma A stampa al terminale la lista dei percorsi ricevuti. 
+
+La coppia di programmi può essere provata usando l'indirizzo
+localhost all'interno della stessa macchina.
+
+I due programmi non devono usare le chiamate system() e popen().
+
+______________________________________________________________________
+English text
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+To be provided soon
+

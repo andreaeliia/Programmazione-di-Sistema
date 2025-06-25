@@ -1,0 +1,94 @@
+Testo in italiano
+
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux2.unisalento.it una directory
+denominata proprioaccount.esameSNP43 (es.franco.esameSNP43) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria
+home su hplinux2.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di
+makefile. Anche nel caso in cui non sia possibile risolvere il
+problema in accordo con lo standard, la soluzione deve comunque
+funzionare su Linux e macOS. Nella directory si DEVE anche creare un
+file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le
+soluzioni oltre ad eventuali commenti e/o osservazioni. Si fa presente
+che il contenuto di tale file permette spesso una migliore
+comprensione della logica seguita nello svolgimento e, di conseguenza,
+la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP43.tgz $USER.esameSNP43
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP43 è
+stata trasferita sulla propria home su hplinux2.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la
+consegna del compito, di fare riferimento alla pagina web: 
+http://www.liis.it/mw/index.php/LiiS:Istruzioni ]
+
+Esercizio
+
+Scrivere un programma C che lanci tre processi A, B e C. Ognuno dei tre
+processi deve aggiungere continuamente, con un intervallo di 3 secondi,
+in uno spazio di memoria condivisa, un record costituito da: 1) il
+proprio PID; 2) un numero intero casuale; 3) l'istante della scrittura.
+
+I tre processi devono gestire la concorrenza ed evitare che le scritture
+dei record si intersechino, sfruttando il meccanismo del record locking
+su di un file.
+
+Alla pressione dei tasti Ctrl-C i tre processi devono essere terminati e
+il contenuto della memoria condivisa deve essere stampato allo standard
+output.
+
+______________________________________________________________________
+English text
+
+[BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP43 in your home on
+hplinux2.unisalento.it (e.g. franco.esameSNP43) and solve the exercise in that
+directory or, alternatively, create a directory with the same name in your macOS
+home, and solve the exercise in that directory. Eventually, transfer it to your
+home on hplinux2.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be provided. 
+If the solution and the compliance are not possible together, the solution must 
+anyway be working both on Linux and macOS. In the same directory, a file named
+README.txt containing a description of the solution and, possibly,
+comments/observations on the choices made to solve the problem, MUST be placed. 
+Keep in mind that the file may help the reader to understand the logic you 
+adopted and to better appreciate your work.
+
+When finished, issue in your own Linux account the following command line:
+
+cd; tar cvfz $USER.esameSNP43.tgz $USER.esameSNP43
+
+[BEWARE: the command above shown must be issued in the shell running in the
+Linux machine, AFTER the folder youraccount.esameSNP43 has been transferred to
+your home on hplinux2.unisalento.it and NOT when it's still in your home on
+macOS (if you wrote the program there). For any doubt about the way to carry on
+the exercise and how to hand it in, please read the web page (still in italian,
+sorry, soon to be translated in english):
+http://www.liis.it/mw/index.php/LiiS:Istruzioni]
+
+Exercise
+
+Write a C program which launches three processes A, B and C. Each of the
+three processes must add, continuously and with an interval of 3
+seconds, into a shared memory, a record containing: 1) its PID; 2) a
+random integer number; 3) the complete date of the writing.
+
+The three processes must manage concurrency and avoid the interlacing of
+the records' writing using the record locking mechanism on a file.
+
+When Ctrl-C is pressed the processes must stop and the content of the
+shared memory must be printed to the standard output.
+
+
+

@@ -1,0 +1,85 @@
+Testo in italiano
+
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux2.unisalento.it una directory
+denominata proprioaccount.esameSNP33 (es.franco.esameSNP33) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria
+home su hplinux2.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di
+makefile. Anche nel caso in cui non sia possibile risolvere il
+problema in accordo con lo standard, la soluzione deve comunque
+funzionare su Linux e macOS. Nella directory si DEVE anche creare un
+file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le
+soluzioni oltre ad eventuali commenti e/o osservazioni. Si fa presente
+che il contenuto di tale file permette spesso una migliore
+comprensione della logica seguita nello svolgimento e, di conseguenza,
+la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP33.tgz $USER.esameSNP33
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP33 è
+stata trasferita sulla propria home su hplinux2.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la
+consegna del compito, di fare riferimento alla pagina web: 
+http://www.liis.it/mw/index.php/LiiS:Istruzioni ]
+
+Esercizio
+
+Un gruppo di 11 computer fa parte della stessa subnet. Una di queste
+macchine, denominata A, è la macchina master. Ognuna delle altre
+macchine è identificata da un numero unico K (0 ≤ K ≤ 9). Ad un certo
+istante la macchina A emette una sequenza di tre datagrammi identici
+in modalità multicast distanziati di un secondo con la quale fornisce
+due numeri N ed M. N è il numero progressivo del round (che in questa
+prima sequenza multicast è posto a 0) ed M è un valore fisso indicante
+l'ampiezza di un un range numerico sul quale vanno effettuati dei
+calcoli (per esempio 15000 in tutte le emissioni). Appena ricevuto il
+messaggio contenente i due numeri, ogni macchina della subnet comincia
+a calcolare, salvando i risultati in un file, le radici quadrate di
+tutti i numeri interi H tali che
+
+M*(N*10 + K) ≤ H < M*(N*10 + K + 1)
+
+comunicando alla macchina A il termine del calcolo.
+
+Appena la macchina master ha notizia che tutte le macchine hanno
+terminato il calcolo, essa emette nuovamente una terna di datagrammi
+che incrementa il numero N di 1 rispetto al round precedente. Il
+calcolo e le comunicazioni si ripetono fino a che non si è raggiunto
+il numero di round desiderati (es. 10 in tutto, ovvero 0 ≤ N ≤ 9).
+
+Scrivere: 1) il programma necessario al funzionamento della macchina
+master A; 2) il programma necessario al funzionamento delle macchine
+che effettuano il calcolo, distinguendo in esso una thread destinata a
+gestire le comunicazioni e una thread che esegue i calcoli.
+
+Per rendersi meglio conto dei range numerici che saranno via via 
+l'input dei calcoli di ciascuna delle macchine si dia nel terminale
+il comando:
+
+M=15000; for N in $(seq 0 9); do for K in $(seq 0 9) ; do echo  \
+$((M*(N*10+K))) N=$N K=$K; echo $((M*(N*10+K+1)))  N=$N K=$K; echo;
+done; done
+
+Note: 
+- come indirizzo multicast per lo svolgimento dell'esercizio
+usare 224.0.0.X, dove X è il quarto elemento dell'indirizzo IP della
+propria macchina in notazione quadripuntata. 
+- Sviluppare e testare sulla propria macchina sia il programma master
+che quello slave, scegliendo un K (0 ≤ K ≤ 9) qualunque per essa.
+
+______________________________________________________________________
+English text
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+To be provided soon
+

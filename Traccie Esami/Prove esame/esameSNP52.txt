@@ -1,0 +1,53 @@
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP52 in your home on
+hplinux2.unisalento.it (e.g. franco.esameSNP52) and solve the exercise in that
+directory or, alternatively, create a directory with the same name in your
+macOS home, and solve the exercise in that directory. Eventually, transfer it
+to your home on hplinux2.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be provided.
+If the solution and the compliance are not possible together, the solution
+must anyway be working both on Linux and macOS. In the same directory, a file
+named README.txt containing a description of the solution and, possibly,
+comments/observations on the choices made to solve the problem, MUST be
+placed. Keep in mind that the file may help the reader to understand the logic
+you adopted and to better appreciate your work.
+
+When finished, execute in your own Linux account the following command line:
+
+cd; tar cvfz $USER.esameSNP52.tgz $USER.esameSNP52
+
+[BEWARE: the command above shown must be issued in the shell running in the
+Linux machine, AFTER the folder youraccount.esameSNP52 has been transferred to
+your home on hplinux2.unisalento.it and NOT when it's still in your home on
+macOS (if you wrote the program there). ]
+
+Exercise
+
+A 4-way crossroads must be simulated by C programs as follows:
+
+1) 4 processes simulate the 4 roads by generating a random arrival of
+vehicles and a fifth process is in charge of the control of the
+crossroadss;
+
+2) Once one of the four ways lets the first vehicle in its queue move
+through the crossroads, the other three roads will keep their vehicles
+from crossing it.
+
+3) Crossing the crossroads takes 3 seconds and, after that, the moving
+vehicle is removed from the queue.
+
+4) When the vehicle has crossed the crossroads, any of the first
+vehicles in the queues of each of the four roads is allowed to move.
+
+
+
+
+
+
+
+
+
+

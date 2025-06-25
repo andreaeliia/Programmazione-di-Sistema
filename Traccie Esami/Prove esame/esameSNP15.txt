@@ -1,0 +1,42 @@
+[Attenzione: questo è un testo codificato in UTF-8] Creare nella propria home su
+hplinux2.unisalento.it una directory denominata proprioaccount.esameSNP15
+(es.franco.esameSNP15) e svolgere l'esercizio in tale directory o, in
+alternativa, creare una directory con lo stesso nome nella propria home Mac OS
+X, svolgere gli esercizi in tale directory e, alla fine della prova, trasferirla
+nella propria home su hplinux2.unisalento.it.
+
+I programmi creati devono essere compilabili ed eseguibili sia su Mac OS X che
+su Linux. Nella directory si DEVE anche creare un file di nome "leggimi.txt" che
+descriva l'impostazione adottata per le soluzioni oltre ad eventuali commenti
+e/o osservazioni. Si fa presente che il contenuto di tale file permette spesso
+una migliore comprensione della logica seguita nello svolgimento e, di
+conseguenza, la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP15.tgz $USER.esameSNP15
+
+[ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito sulla
+macchina Linux, DOPO che la cartella proprioaccount.esameSNP15 è stata
+trasferita sulla propria home su hplinux2.unisalento.it e NON mentre è ancora
+nella propria home su Mac OS X (se in essa si è lavorato). Si raccomanda, per
+qualsiasi dubbio sullo svolgimento e la consegna del compito, di fare
+riferimento alla pagina web: http://www.liis.it/mw/index.php/LiiS:Istruzioni]
+
+Esercizio
+
+Un server UDP funziona simultaneamente su tre porte grazie a tre thread dedicate.  
+Le thread producono oggetti e li rendono disponibili alla main thread ogni qualvolta
+ricevono un input da un client di rete. 
+La main thread li consuma utilizzando una condition variable per evitare che la 
+gestione della concorrenza costringa il processore ad un lavoro inutile. 
+
+A UDP server listens simultaneously on three ports by three dedicated threads.
+Each time a serving thread receives an input from the network, it produces an object and makes it available to the main thread.
+The main thread consumes it using a condition variable to avoid idle cycling.
+
+
+
+
+
+

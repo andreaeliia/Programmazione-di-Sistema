@@ -1,0 +1,40 @@
+[BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP51 in your home on
+hplinux2.unisalento.it (e.g. franco.esameSNP51) and solve the exercise
+in that directory or, alternatively, create a directory with the same
+name in your macOS home, and solve the exercise in that directory.
+Eventually, transfer it to your home on hplinux2.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be
+provided. If the solution and the compliance are not possible together,
+the solution must anyway be working both on Linux and macOS. In the same
+directory, a file named README.txt containing a description of the
+solution and, possibly, comments/observations on the choices made to
+solve the problem, MUST be placed. Keep in mind that the file may help
+the reader to understand the logic you adopted and to better appreciate
+your work.
+
+When finished, issue in your own Linux account the following command
+line:
+
+cd; tar cvfz $USER.esameSNP51.tgz $USER.esameSNP51
+
+[ BEWARE: the command above shown must be issued in the shell running in
+the Linux machine, AFTER the folder youraccount.esameSNP51 has been
+transferred to your home on hplinux2.unisalento.it and NOT when it's
+still in your home on macOS (in the case you wrote the program there).
+
+Exercise
+
+Build a multicast sender T and a multicast receiver R operating as
+follows:
+
+1) T places a point at coordinates {40,40} in a square matrix of 80x80
+points. Such point starts moving, one step per second, to one of the 8
+adjacent points in a random direction, while T sends its position at
+each new step to a multicast address.
+
+2) R receives from T the multicast transmission of the current point's
+position in the matrix and represents it, graphically and dinamically,
+in a terminal window (i.e. using the noncanonical mode).

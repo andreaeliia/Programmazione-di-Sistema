@@ -36,6 +36,7 @@
 #include <string.h>
 #include <time.h>
 #include <errno.h>
+#include <signal.h>
 
 // Esempio base fork
 void basic_fork_example() {
@@ -53,26 +54,26 @@ void basic_fork_example() {
         
     } else if (pid == 0) {
         // PROCESSO FIGLIO
-        printf("👶 FIGLIO - PID: %d, PPID: %d, fork() returned: %d\n", 
+        printf("FIGLIO - PID: %d, PPID: %d, fork() returned: %d\n", 
                getpid(), getppid(), pid);
         
         // Lavoro del figlio
         for (int i = 1; i <= 3; i++) {
-            printf("👶 Figlio: iterazione %d\n", i);
+            printf("Figlio: iterazione %d\n", i);
             sleep(1);
         }
         
-        printf("👶 Figlio termina\n");
+        printf("Figlio termina\n");
         exit(42);  // Exit status personalizzato
         
     } else {
         // PROCESSO PADRE
-        printf("👨 PADRE - PID: %d, PPID: %d, child PID: %d\n", 
+        printf("PADRE - PID: %d, PPID: %d, child PID: %d\n", 
                getpid(), getppid(), pid);
         
         // Lavoro del padre
         for (int i = 1; i <= 2; i++) {
-            printf("👨 Padre: iterazione %d\n", i);
+            printf("Padre: iterazione %d\n", i);
             sleep(1);
         }
         
@@ -80,12 +81,12 @@ void basic_fork_example() {
         int status;
         pid_t child_pid = wait(&status);
         
-        printf("👨 Padre: figlio %d terminato con status %d\n", child_pid, status);
+        printf("Padre: figlio %d terminato con status %d\n", child_pid, status);
         
         if (WIFEXITED(status)) {
-            printf("👨 Padre: figlio uscito normalmente con codice %d\n", WEXITSTATUS(status));
+            printf("Padre: figlio uscito normalmente con codice %d\n", WEXITSTATUS(status));
         } else if (WIFSIGNALED(status)) {
-            printf("👨 Padre: figlio terminato da segnale %d\n", WTERMSIG(status));
+            printf("Padre: figlio terminato da segnale %d\n", WTERMSIG(status));
         }
     }
 }
@@ -97,7 +98,7 @@ void multiple_fork_example() {
     int num_children = 3;
     pid_t children[num_children];
     
-    printf("👨 Padre: creo %d processi figlio\n", num_children);
+    printf("Padre: creo %d processi figlio\n", num_children);
     
     for (int i = 0; i < num_children; i++) {
         pid_t pid = fork();
@@ -112,31 +113,31 @@ void multiple_fork_example() {
             
         } else if (pid == 0) {
             // PROCESSO FIGLIO
-            printf("👶 Figlio %d: PID %d avviato\n", i, getpid());
+            printf("Figlio %d: PID %d avviato\n", i, getpid());
             
             // Simula lavoro diverso per ogni figlio
             int work_time = 2 + i;
-            printf("👶 Figlio %d: lavoro per %d secondi\n", i, work_time);
+            printf("Figlio %d: lavoro per %d secondi\n", i, work_time);
             sleep(work_time);
             
-            printf("👶 Figlio %d: completato\n", i);
+            printf("Figlio %d: completato\n", i);
             exit(i + 10);  // Exit code distintivo
             
         } else {
             // PROCESSO PADRE
             children[i] = pid;
-            printf("👨 Padre: creato figlio %d con PID %d\n", i, pid);
+            printf("Padre: creato figlio %d con PID %d\n", i, pid);
         }
     }
     
     // Padre aspetta tutti i figli
-    printf("👨 Padre: aspetto terminazione di tutti i figli\n");
+    printf("Padre: aspetto terminazione di tutti i figli\n");
     
     for (int i = 0; i < num_children; i++) {
         int status;
         pid_t terminated_pid = wait(&status);
         
-        printf("👨 Padre: figlio PID %d terminato", terminated_pid);
+        printf("Padre: figlio PID %d terminato", terminated_pid);
         
         if (WIFEXITED(status)) {
             printf(" con exit code %d\n", WEXITSTATUS(status));
@@ -145,7 +146,7 @@ void multiple_fork_example() {
         }
     }
     
-    printf("👨 Padre: tutti i figli terminati\n");
+    printf("Padre: tutti i figli terminati\n");
 }
 
 // Fork con condivisione dati (attenzione!)
@@ -162,11 +163,11 @@ void fork_data_sharing_example() {
     
     if (pid == 0) {
         // FIGLIO - modifica variabili
-        printf("👶 Figlio: modifico variabili\n");
+        printf("Figlio: modifico variabili\n");
         shared_var = 999;
         *heap_var = 888;
         
-        printf("👶 Figlio: shared_var=%d, heap_var=%d\n", shared_var, *heap_var);
+        printf("Figlio: shared_var=%d, heap_var=%d\n", shared_var, *heap_var);
         
         free(heap_var);  // Ogni processo deve fare free della sua copia
         exit(0);
@@ -175,8 +176,8 @@ void fork_data_sharing_example() {
         // PADRE - aspetta e controlla variabili
         wait(NULL);
         
-        printf("👨 Padre dopo wait: shared_var=%d, heap_var=%d\n", shared_var, *heap_var);
-        printf("👨 Padre: le modifiche del figlio NON sono visibili (memory copy)\n");
+        printf("Padre dopo wait: shared_var=%d, heap_var=%d\n", shared_var, *heap_var);
+        printf("Padre: le modifiche del figlio NON sono visibili (memory copy)\n");
         
         free(heap_var);
     }
@@ -203,12 +204,12 @@ void fork_with_pipe_example() {
         // FIGLIO - legge dalla pipe
         close(pipefd[1]);  // Chiudi scrittura
         
-        printf("👶 Figlio: aspetto messaggio dalla pipe...\n");
+        printf("Figlio: aspetto messaggio dalla pipe...\n");
         
         int bytes_read = read(pipefd[0], buffer, sizeof(buffer));
         if (bytes_read > 0) {
             buffer[bytes_read] = '\0';
-            printf("👶 Figlio: ricevuto '%s'\n", buffer);
+            printf("Figlio: ricevuto '%s'\n", buffer);
         }
         
         close(pipefd[0]);
@@ -218,13 +219,13 @@ void fork_with_pipe_example() {
         // PADRE - scrive nella pipe
         close(pipefd[0]);  // Chiudi lettura
         
-        printf("👨 Padre: invio messaggio...\n");
+        printf("Padre: invio messaggio...\n");
         write(pipefd[1], message, strlen(message));
         
         close(pipefd[1]);  // Chiudi per segnalare EOF
         wait(NULL);
         
-        printf("👨 Padre: comunicazione completata\n");
+        printf("Padre: comunicazione completata\n");
     }
 }
 
@@ -244,7 +245,7 @@ pid_t safe_fork() {
         if (errno == EAGAIN || errno == ENOMEM) {
             // Errore temporaneo - retry
             retry_count++;
-            printf("⚠️  Fork fallito (tentativo %d/%d): %s\n", 
+            printf("Fork fallito (tentativo %d/%d): %s\n", 
                    retry_count, max_retries, strerror(errno));
             sleep(1);  // Aspetta prima di riprovare
         } else {
@@ -254,7 +255,7 @@ pid_t safe_fork() {
         }
     }
     
-    printf("❌ Fork fallito dopo %d tentativi\n", max_retries);
+    printf("Fork fallito dopo %d tentativi\n", max_retries);
     return -1;
 }
 
@@ -268,7 +269,7 @@ void fork_bomb_protection_example() {
     
     for (int i = 0; i < 10; i++) {  // Prova a creare 10 processi
         if (active_processes >= max_processes) {
-            printf("🛑 Limite processi raggiunto (%d), aspetto...\n", max_processes);
+            printf("Limite processi raggiunto (%d), aspetto...\n", max_processes);
             
             // Aspetta che almeno un processo termini
             wait(NULL);
@@ -279,14 +280,14 @@ void fork_bomb_protection_example() {
         
         if (pid == 0) {
             // Figlio - simula lavoro breve
-            printf("👶 Processo figlio %d (PID %d) avviato\n", i, getpid());
+            printf("Processo figlio %d (PID %d) avviato\n", i, getpid());
             sleep(2);
-            printf("👶 Processo figlio %d terminato\n", i);
+            printf("Processo figlio %d terminato\n", i);
             exit(0);
             
         } else if (pid > 0) {
             active_processes++;
-            printf("👨 Creato processo %d/%d (PID %d)\n", i+1, 10, pid);
+            printf("Creato processo %d/%d (PID %d)\n", i+1, 10, pid);
             
         } else {
             perror("fork");
@@ -300,7 +301,30 @@ void fork_bomb_protection_example() {
         active_processes--;
     }
     
-    printf("👨 Tutti i processi terminati\n");
+    printf("Tutti i processi terminati\n");
+}
+
+// MAIN per esempi fork
+int main() {
+    printf("ESEMPI FORK - Process Management\n");
+    printf("=================================\n\n");
+    
+    basic_fork_example();
+    sleep(1);
+    
+    multiple_fork_example();
+    sleep(1);
+    
+    fork_data_sharing_example();
+    sleep(1);
+    
+    fork_with_pipe_example();
+    sleep(1);
+    
+    fork_bomb_protection_example();
+    
+    printf("\nTutti gli esempi fork completati\n");
+    return 0;
 }
 ```
 
@@ -314,6 +338,7 @@ void fork_bomb_protection_example() {
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <errno.h>
 
 // Esempio exec base
 void basic_exec_example() {
@@ -323,7 +348,7 @@ void basic_exec_example() {
     
     if (pid == 0) {
         // FIGLIO - esegue comando esterno
-        printf("👶 Figlio: eseguo comando 'ls -la'\n");
+        printf("Figlio: eseguo comando 'ls -la'\n");
         
         // execl: lista argomenti terminata da NULL
         execl("/bin/ls", "ls", "-la", NULL);
@@ -337,7 +362,7 @@ void basic_exec_example() {
         int status;
         wait(&status);
         
-        printf("👨 Padre: comando completato con status %d\n", status);
+        printf("Padre: comando completato con status %d\n", status);
         
     } else {
         perror("fork");
@@ -355,7 +380,7 @@ void exec_variants_example() {
     // Test 1: execl
     children[0] = fork();
     if (children[0] == 0) {
-        printf("👶 Test 1 - execl: echo con parametri\n");
+        printf("Test 1 - execl: echo con parametri\n");
         execl("/bin/echo", "echo", "Ciao", "dal", "figlio", "1", NULL);
         perror("execl");
         exit(1);
@@ -364,7 +389,7 @@ void exec_variants_example() {
     // Test 2: execlp (cerca in PATH)
     children[1] = fork();
     if (children[1] == 0) {
-        printf("👶 Test 2 - execlp: date\n");
+        printf("Test 2 - execlp: date\n");
         execlp("date", "date", "+%Y-%m-%d %H:%M:%S", NULL);
         perror("execlp");
         exit(1);
@@ -373,7 +398,7 @@ void exec_variants_example() {
     // Test 3: execv (array di argomenti)
     children[2] = fork();
     if (children[2] == 0) {
-        printf("👶 Test 3 - execv: wc con array\n");
+        printf("Test 3 - execv: wc con array\n");
         char *args[] = {"wc", "-l", "/etc/passwd", NULL};
         execv("/usr/bin/wc", args);
         perror("execv");
@@ -383,7 +408,7 @@ void exec_variants_example() {
     // Test 4: execvp (array + PATH)
     children[3] = fork();
     if (children[3] == 0) {
-        printf("👶 Test 4 - execvp: ps\n");
+        printf("Test 4 - execvp: ps\n");
         char *args[] = {"ps", "aux", NULL};
         execvp("ps", args);
         perror("execvp");
@@ -394,7 +419,7 @@ void exec_variants_example() {
     for (int i = 0; i < num_tests; i++) {
         int status;
         pid_t completed = wait(&status);
-        printf("👨 Padre: processo completato (PID %d, status %d)\n", completed, status);
+        printf("Padre: processo completato (PID %d, status %d)\n", completed, status);
     }
 }
 
@@ -406,7 +431,7 @@ void exec_with_environment() {
     
     if (pid == 0) {
         // Figlio - modifica environment
-        printf("👶 Figlio: eseguo comando con environment personalizzato\n");
+        printf("Figlio: eseguo comando con environment personalizzato\n");
         
         // Crea environment personalizzato
         char *env[] = {
@@ -425,7 +450,7 @@ void exec_with_environment() {
         
     } else {
         wait(NULL);
-        printf("👨 Padre: comando environment completato\n");
+        printf("Padre: comando environment completato\n");
     }
 }
 
@@ -443,7 +468,7 @@ int safe_exec(const char* program, char* const args[]) {
         execvp(program, args);
         
         // Se arriviamo qui, exec è fallito
-        fprintf(stderr, "❌ Impossibile eseguire '%s': %s\n", program, strerror(errno));
+        fprintf(stderr, "Impossibile eseguire '%s': %s\n", program, strerror(errno));
         exit(127);  // Exit code standard per "command not found"
     }
     
@@ -457,12 +482,12 @@ int safe_exec(const char* program, char* const args[]) {
     if (WIFEXITED(status)) {
         int exit_code = WEXITSTATUS(status);
         if (exit_code == 127) {
-            printf("❌ Comando '%s' non trovato\n", program);
+            printf("Comando '%s' non trovato\n", program);
             return -1;
         }
         return exit_code;
     } else if (WIFSIGNALED(status)) {
-        printf("❌ Comando '%s' terminato da segnale %d\n", program, WTERMSIG(status));
+        printf("Comando '%s' terminato da segnale %d\n", program, WTERMSIG(status));
         return -1;
     }
     
@@ -472,7 +497,7 @@ int safe_exec(const char* program, char* const args[]) {
 // Shell semplice con exec
 void simple_shell_example() {
     printf("\n=== SHELL SEMPLICE ===\n");
-    printf("💡 Comandi: scrivi comando, 'exit' per uscire\n");
+    printf("Comandi: scrivi comando, 'exit' per uscire\n");
     
     char input[256];
     char *args[64];
@@ -527,16 +552,16 @@ void master_worker_example() {
     const char* tasks[] = {"sleep 1", "echo Task1", "echo Task2", "date", "whoami"};
     const int num_tasks = sizeof(tasks) / sizeof(tasks[0]);
     
-    printf("👨 Master: avvio %d worker per %d task\n", num_workers, num_tasks);
+    printf("Master: avvio %d worker per %d task\n", num_workers, num_tasks);
     
     for (int task = 0; task < num_tasks; task++) {
-        printf("👨 Master: assegno task '%s'\n", tasks[task]);
+        printf("Master: assegno task '%s'\n", tasks[task]);
         
         pid_t worker = fork();
         
         if (worker == 0) {
             // Worker - esegue task
-            printf("👷 Worker %d (PID %d): eseguo '%s'\n", task, getpid(), tasks[task]);
+            printf("Worker %d (PID %d): eseguo '%s'\n", task, getpid(), tasks[task]);
             
             // Parse comando semplice
             char task_copy[256];
@@ -561,7 +586,7 @@ void master_worker_example() {
             
         } else if (worker > 0) {
             // Master - continua con prossimo task
-            printf("👨 Master: worker %d avviato (PID %d)\n", task, worker);
+            printf("Master: worker %d avviato (PID %d)\n", task, worker);
             
         } else {
             perror("fork worker");
@@ -573,12 +598,35 @@ void master_worker_example() {
             for (int w = 0; w < num_workers && task - w >= 0; w++) {
                 int status;
                 pid_t completed = wait(&status);
-                printf("👨 Master: worker completato (PID %d)\n", completed);
+                printf("Master: worker completato (PID %d)\n", completed);
             }
         }
     }
     
-    printf("👨 Master: tutti i task completati\n");
+    printf("Master: tutti i task completati\n");
+}
+
+// MAIN per esempi exec
+int main() {
+    printf("ESEMPI EXEC - Process Management\n");
+    printf("=================================\n\n");
+    
+    basic_exec_example();
+    sleep(1);
+    
+    exec_variants_example();
+    sleep(1);
+    
+    exec_with_environment();
+    sleep(1);
+    
+    master_worker_example();
+    
+    printf("\nPer testare la shell semplice, decommenta la riga seguente:\n");
+    // simple_shell_example();  // Decommenta per testare
+    
+    printf("\nTutti gli esempi exec completati\n");
+    return 0;
 }
 ```
 
@@ -603,30 +651,30 @@ void basic_wait_example() {
     
     if (pid == 0) {
         // Figlio - simula lavoro
-        printf("👶 Figlio: lavoro per 3 secondi\n");
+        printf("Figlio: lavoro per 3 secondi\n");
         sleep(3);
-        printf("👶 Figlio: termino con exit code 42\n");
+        printf("Figlio: termino con exit code 42\n");
         exit(42);
         
     } else {
         // Padre - wait semplice
-        printf("👨 Padre: aspetto figlio...\n");
+        printf("Padre: aspetto figlio...\n");
         
         int status;
         pid_t child_pid = wait(&status);
         
-        printf("👨 Padre: figlio %d terminato\n", child_pid);
+        printf("Padre: figlio %d terminato\n", child_pid);
         
         // Analizza status
         if (WIFEXITED(status)) {
-            printf("👨 Padre: uscita normale, exit code = %d\n", WEXITSTATUS(status));
+            printf("Padre: uscita normale, exit code = %d\n", WEXITSTATUS(status));
         } else if (WIFSIGNALED(status)) {
-            printf("👨 Padre: terminato da segnale %d\n", WTERMSIG(status));
+            printf("Padre: terminato da segnale %d\n", WTERMSIG(status));
             if (WCOREDUMP(status)) {
-                printf("👨 Padre: core dump generato\n");
+                printf("Padre: core dump generato\n");
             }
         } else if (WIFSTOPPED(status)) {
-            printf("👨 Padre: fermato da segnale %d\n", WSTOPSIG(status));
+            printf("Padre: fermato da segnale %d\n", WSTOPSIG(status));
         }
     }
 }
@@ -644,25 +692,25 @@ void waitpid_example() {
         if (children[i] == 0) {
             // Figlio
             int sleep_time = (i + 1) * 2;  // 2, 4, 6 secondi
-            printf("👶 Figlio %d (PID %d): dormo %d secondi\n", i, getpid(), sleep_time);
+            printf("Figlio %d (PID %d): dormo %d secondi\n", i, getpid(), sleep_time);
             sleep(sleep_time);
-            printf("👶 Figlio %d: termino\n", i);
+            printf("Figlio %d: termino\n", i);
             exit(i + 10);
         }
     }
     
     // Padre aspetta specifico figlio (ultimo creato)
-    printf("👨 Padre: aspetto specificamente figlio %d (PID %d)\n", 2, children[2]);
+    printf("Padre: aspetto specificamente figlio %d (PID %d)\n", 2, children[2]);
     
     int status;
     pid_t waited = waitpid(children[2], &status, 0);
     
-    printf("👨 Padre: figlio specifico %d terminato con status %d\n", waited, WEXITSTATUS(status));
+    printf("Padre: figlio specifico %d terminato con status %d\n", waited, WEXITSTATUS(status));
     
     // Aspetta gli altri
-    printf("👨 Padre: aspetto gli altri figli...\n");
+    printf("Padre: aspetto gli altri figli...\n");
     while (wait(NULL) > 0) {
-        printf("👨 Padre: un altro figlio terminato\n");
+        printf("Padre: un altro figlio terminato\n");
     }
 }
 
@@ -674,13 +722,13 @@ void nonblocking_wait_example() {
     
     if (pid == 0) {
         // Figlio - lavoro lungo
-        printf("👶 Figlio: lavoro lungo (10 secondi)\n");
+        printf("Figlio: lavoro lungo (10 secondi)\n");
         sleep(10);
         exit(0);
         
     } else {
         // Padre - controllo periodico
-        printf("👨 Padre: controllo periodico figlio...\n");
+        printf("Padre: controllo periodico figlio...\n");
         
         int status;
         pid_t result;
@@ -689,10 +737,10 @@ void nonblocking_wait_example() {
             result = waitpid(pid, &status, WNOHANG);  // Non-bloccante
             
             if (result == 0) {
-                printf("👨 Padre: figlio ancora in esecuzione...\n");
+                printf("Padre: figlio ancora in esecuzione...\n");
                 sleep(2);  // Fai altro lavoro
             } else if (result == pid) {
-                printf("👨 Padre: figlio terminato!\n");
+                printf("Padre: figlio terminato!\n");
                 break;
             } else {
                 perror("waitpid");
@@ -710,30 +758,27 @@ void zombie_prevention_example() {
     // Signal handler per SIGCHLD
     signal(SIGCHLD, SIG_IGN);  // Automatico cleanup figli
     
-    printf("👨 Padre: creo figli che terminano rapidamente\n");
+    printf("Padre: creo figli che terminano rapidamente\n");
     
     for (int i = 0; i < 5; i++) {
         pid_t pid = fork();
         
         if (pid == 0) {
             // Figlio - termina subito
-            printf("👶 Figlio %d: termino immediatamente\n", i);
+            printf("Figlio %d: termino immediatamente\n", i);
             exit(i);
             
         } else {
-            printf("👨 Padre: creato figlio %d (PID %d)\n", i, pid);
+            printf("Padre: creato figlio %d (PID %d)\n", i, pid);
         }
         
         sleep(1);  // Pausa tra creazioni
     }
     
-    printf("👨 Padre: tutti i figli creati, nessun zombie dovrebbe esistere\n");
-    
-    // Verifica con ps
-    system("ps aux | grep -E '(PID|zombie|Z+)' | head -10");
+    printf("Padre: tutti i figli creati, nessun zombie dovrebbe esistere\n");
     
     sleep(2);
-    printf("👨 Padre: fine esempio\n");
+    printf("Padre: fine esempio\n");
 }
 
 // Wait con timeout
@@ -766,34 +811,34 @@ void wait_timeout_example() {
     if (pid == 0) {
         // Figlio - lavoro variabile
         int work_time = 7;
-        printf("👶 Figlio: lavoro per %d secondi\n", work_time);
+        printf("Figlio: lavoro per %d secondi\n", work_time);
         sleep(work_time);
         exit(0);
         
     } else {
         // Padre - wait con timeout
         int timeout = 5;
-        printf("👨 Padre: aspetto figlio con timeout %d secondi\n", timeout);
+        printf("Padre: aspetto figlio con timeout %d secondi\n", timeout);
         
         int status;
         int result = wait_with_timeout(pid, &status, timeout);
         
         if (result == 1) {
-            printf("👨 Padre: figlio terminato entro timeout\n");
+            printf("Padre: figlio terminato entro timeout\n");
         } else if (result == 0) {
-            printf("👨 Padre: timeout raggiunto, termino figlio\n");
+            printf("Padre: timeout raggiunto, termino figlio\n");
             kill(pid, SIGTERM);
             sleep(1);
             
             // Verifica terminazione
             if (waitpid(pid, &status, WNOHANG) == 0) {
-                printf("👨 Padre: figlio non risponde, forzo terminazione\n");
+                printf("Padre: figlio non risponde, forzo terminazione\n");
                 kill(pid, SIGKILL);
             }
             
             wait(&status);  // Cleanup finale
         } else {
-            printf("👨 Padre: errore wait\n");
+            printf("Padre: errore wait\n");
         }
     }
 }
@@ -809,14 +854,14 @@ void process_group_wait_example() {
         // Figlio diventa leader gruppo
         setpgid(0, 0);  // Crea nuovo gruppo con PID come PGID
         
-        printf("👑 Leader gruppo (PID %d, PGID %d)\n", getpid(), getpgrp());
+        printf("Leader gruppo (PID %d, PGID %d)\n", getpid(), getpgrp());
         
         // Crea altri membri del gruppo
         for (int i = 0; i < 2; i++) {
             pid_t member = fork();
             
             if (member == 0) {
-                printf("👥 Membro gruppo %d (PID %d, PGID %d)\n", i, getpid(), getpgrp());
+                printf("Membro gruppo %d (PID %d, PGID %d)\n", i, getpid(), getpgrp());
                 sleep(3 + i);
                 exit(0);
             }
@@ -824,20 +869,46 @@ void process_group_wait_example() {
         
         // Leader aspetta membri
         while (wait(NULL) > 0) {
-            printf("👑 Leader: un membro terminato\n");
+            printf("Leader: un membro terminato\n");
         }
         
-        printf("👑 Leader: tutti i membri terminati, esco\n");
+        printf("Leader: tutti i membri terminati, esco\n");
         exit(0);
         
     } else {
         // Padre originale
-        printf("👨 Padre: creato gruppo con leader PID %d\n", group_leader);
+        printf("Padre: creato gruppo con leader PID %d\n", group_leader);
         
         // Aspetta terminazione gruppo
         wait(NULL);
-        printf("👨 Padre: gruppo terminato\n");
+        printf("Padre: gruppo terminato\n");
     }
+}
+
+// MAIN per esempi wait
+int main() {
+    printf("ESEMPI WAIT - Process Management\n");
+    printf("=================================\n\n");
+    
+    basic_wait_example();
+    sleep(1);
+    
+    waitpid_example();
+    sleep(1);
+    
+    nonblocking_wait_example();
+    sleep(1);
+    
+    zombie_prevention_example();
+    sleep(1);
+    
+    wait_timeout_example();
+    sleep(1);
+    
+    process_group_wait_example();
+    
+    printf("\nTutti gli esempi wait completati\n");
+    return 0;
 }
 ```
 
@@ -846,6 +917,15 @@ void process_group_wait_example() {
 ## 🛠️ Utility Process Management
 
 ```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <errno.h>
+#include <time.h>
+#include <string.h>
+
 // Struttura per gestire pool di processi
 typedef struct {
     pid_t *pids;
@@ -937,6 +1017,27 @@ typedef struct {
     int timed_out;
 } ProcessResult;
 
+// Wait con timeout per utility
+int wait_with_timeout_util(pid_t pid, int *status, int timeout_seconds) {
+    time_t start_time = time(NULL);
+    
+    while (1) {
+        pid_t result = waitpid(pid, status, WNOHANG);
+        
+        if (result == pid) {
+            return 1;  // Processo terminato
+        } else if (result < 0) {
+            return -1;  // Errore
+        }
+        
+        if (time(NULL) - start_time >= timeout_seconds) {
+            return 0;  // Timeout
+        }
+        
+        usleep(100000);  // 100ms
+    }
+}
+
 ProcessResult* launch_process(ProcessConfig* config) {
     ProcessResult* result = calloc(1, sizeof(ProcessResult));
     int output_pipe[2] = {-1, -1};
@@ -999,7 +1100,7 @@ ProcessResult* launch_process(ProcessConfig* config) {
         // Wait con timeout
         int status;
         if (config->timeout_seconds > 0) {
-            int wait_result = wait_with_timeout(result->pid, &status, config->timeout_seconds);
+            int wait_result = wait_with_timeout_util(result->pid, &status, config->timeout_seconds);
             
             if (wait_result == 0) {
                 // Timeout
@@ -1041,6 +1142,81 @@ void free_process_result(ProcessResult* result) {
         free(result);
     }
 }
+
+// Esempio uso ProcessPool
+void process_pool_example() {
+    printf("=== PROCESS POOL EXAMPLE ===\n");
+    
+    ProcessPool* pool = create_process_pool(5);
+    
+    // Crea alcuni processi worker
+    for (int i = 0; i < 3; i++) {
+        pid_t pid = fork();
+        
+        if (pid == 0) {
+            // Worker
+            printf("Worker %d (PID %d) iniziato\n", i, getpid());
+            sleep(2 + i);
+            printf("Worker %d completato\n", i);
+            exit(i);
+        } else {
+            add_process_to_pool(pool, pid);
+            printf("Aggiunto worker %d al pool\n", i);
+        }
+    }
+    
+    // Aspetta tutti i processi
+    while (pool->count > 0) {
+        pid_t completed = wait_any_process(pool);
+        printf("Processo %d terminato dal pool\n", completed);
+    }
+    
+    cleanup_process_pool(pool);
+    printf("Pool processi pulito\n");
+}
+
+// Esempio uso ProcessConfig
+void process_config_example() {
+    printf("\n=== PROCESS CONFIG EXAMPLE ===\n");
+    
+    // Configura processo
+    ProcessConfig config = {0};
+    config.program = "/bin/echo";
+    
+    char *args[] = {"echo", "Hello from process launcher", NULL};
+    config.args = args;
+    config.timeout_seconds = 5;
+    config.capture_output = 1;
+    
+    // Lancia processo
+    ProcessResult* result = launch_process(&config);
+    
+    if (result) {
+        printf("Processo lanciato (PID %d)\n", result->pid);
+        printf("Exit code: %d\n", result->exit_code);
+        printf("Timed out: %s\n", result->timed_out ? "Sì" : "No");
+        
+        if (result->output) {
+            printf("Output: %s\n", result->output);
+        }
+        
+        free_process_result(result);
+    }
+}
+
+// MAIN per esempi utility
+int main() {
+    printf("ESEMPI UTILITY - Process Management\n");
+    printf("====================================\n\n");
+    
+    process_pool_example();
+    sleep(1);
+    
+    process_config_example();
+    
+    printf("\nTutti gli esempi utility completati\n");
+    return 0;
+}
 ```
 
 ---
@@ -1080,23 +1256,35 @@ void free_process_result(ProcessResult* result) {
 ## 🎯 Compilazione e Test
 
 ```bash
-# Compila esempi
-gcc -o process_mgmt process_examples.c
+# Compila esempi fork
+gcc -o fork_examples fork_examples.c
 
-# Test fork multipli
-./process_mgmt
+# Compila esempi exec
+gcc -o exec_examples exec_examples.c
+
+# Compila esempi wait
+gcc -o wait_examples wait_examples.c
+
+# Compila esempi utility
+gcc -o utility_examples utility_examples.c
+
+# Test esempi
+./fork_examples
+./exec_examples
+./wait_examples
+./utility_examples
 
 # Monitor processi
-ps aux | grep process_mgmt
+ps aux | grep examples
 
 # Test con strace (debugging)
-strace -f ./process_mgmt
+strace -f ./fork_examples
 
 # Test performance
-time ./process_mgmt
+time ./fork_examples
 
 # Controllo memory leaks
-valgrind --tool=memcheck ./process_mgmt
+valgrind --tool=memcheck ./fork_examples
 ```
 
 ## 🚀 Process Management Patterns

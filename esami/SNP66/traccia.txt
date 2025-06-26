@@ -1,0 +1,10 @@
+Due processi indipendenti mappano nella loro memoria lo stesso file e
+scrivono in esso continuamente a intervalli di tempo casuali una stringa
+così costituita: identità del processo (es. Processo 1), un numero
+intero casuale, una marca temporale che caratterizzi in maniera univoca
+l'istante della scrittura, infine nuovamente l'identità del processo. 
+
+Gestire la concorrenza in modo da evitare che le scritture dei due
+processi si intersechino.
+
+=====MUTEX=====

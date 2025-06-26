@@ -1,0 +1,3 @@
+Questo è un test di scrittura file
+Seconda riga
+Terza riga

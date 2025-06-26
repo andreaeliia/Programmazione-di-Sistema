@@ -11,9 +11,12 @@
 8. [File I/O](#file-io)
 9. [Gestione Tempo](#gestione-tempo)
 10. [Allocazione Dinamica](#allocazione-dinamica)
-11. [**Liste Concatenate**](#liste-concatenate) ⭐ **NUOVO**
+11. [**Liste Concatenate**](#liste-concatenate) 
 12. [Preprocessore](#preprocessore)
 13. [Esempi Pratici](#esempi-pratici)
+14. [**Validazione e Controllo Variabili**](#validazione-e-controllo-variabili) 
+15. [**Casting e Conversione**](#casting-e-conversione) 
+
 
 ---
 
@@ -2114,4 +2117,1421 @@ clean:
 
 # Target phony
 .PHONY: clean
+```
+
+
+
+## VALIDAZIONE E CONTROLLO VARIABILI
+
+### Controllo Tipo di Dato e Range
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <limits.h>
+#include <float.h>
+
+// Verifica se una stringa è un numero intero valido
+int is_valid_integer(const char* str) {
+    if (str == NULL || *str == '\0') return 0;
+    
+    int i = 0;
+    // Gestisci segno
+    if (str[0] == '+' || str[0] == '-') i = 1;
+    
+    // Deve avere almeno una cifra dopo il segno
+    if (str[i] == '\0') return 0;
+    
+    // Controlla che tutti i caratteri siano cifre
+    for (; str[i] != '\0'; i++) {
+        if (!isdigit(str[i])) return 0;
+    }
+    
+    return 1;
+}
+
+// Verifica se una stringa è un numero float valido
+int is_valid_float(const char* str) {
+    if (str == NULL || *str == '\0') return 0;
+    
+    int i = 0;
+    int has_dot = 0;
+    
+    // Gestisci segno
+    if (str[0] == '+' || str[0] == '-') i = 1;
+    
+    for (; str[i] != '\0'; i++) {
+        if (str[i] == '.') {
+            if (has_dot) return 0;  // Più di un punto
+            has_dot = 1;
+        } else if (!isdigit(str[i])) {
+            return 0;
+        }
+    }
+    
+    return 1;
+}
+
+// Input sicuro di intero con controllo range
+int input_int_safe(const char* prompt, int min, int max) {
+    char buffer[100];
+    int numero;
+    
+    while (1) {
+        printf("%s (%d-%d): ", prompt, min, max);
+        
+        if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+            printf("Errore lettura input!\n");
+            continue;
+        }
+        
+        // Rimuovi newline
+        buffer[strcspn(buffer, "\n")] = 0;
+        
+        // Verifica se è un numero valido
+        if (!is_valid_integer(buffer)) {
+            printf("❌ Errore: inserire un numero intero valido!\n");
+            continue;
+        }
+        
+        numero = atoi(buffer);
+        
+        // Controllo range
+        if (numero < min || numero > max) {
+            printf("❌ Errore: numero fuori range [%d-%d]!\n", min, max);
+            continue;
+        }
+        
+        return numero;
+    }
+}
+
+// Input sicuro di float con controllo range
+float input_float_safe(const char* prompt, float min, float max) {
+    char buffer[100];
+    float numero;
+    
+    while (1) {
+        printf("%s (%.2f-%.2f): ", prompt, min, max);
+        
+        if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+            printf("Errore lettura input!\n");
+            continue;
+        }
+        
+        buffer[strcspn(buffer, "\n")] = 0;
+        
+        if (!is_valid_float(buffer)) {
+            printf("❌ Errore: inserire un numero decimale valido!\n");
+            continue;
+        }
+        
+        numero = atof(buffer);
+        
+        if (numero < min || numero > max) {
+            printf("❌ Errore: numero fuori range [%.2f-%.2f]!\n", min, max);
+            continue;
+        }
+        
+        return numero;
+    }
+}
+
+int main() {
+    printf("=== CONTROLLO TIPO E RANGE ===\n");
+    
+    // Test controllo stringhe
+    char* test_strings[] = {"123", "-456", "12.34", "abc", "12.34.56", "+789"};
+    int num_tests = sizeof(test_strings) / sizeof(test_strings[0]);
+    
+    printf("\nTest validazione:\n");
+    for (int i = 0; i < num_tests; i++) {
+        printf("'%s' - Int: %s, Float: %s\n", 
+               test_strings[i],
+               is_valid_integer(test_strings[i]) ? "✅" : "❌",
+               is_valid_float(test_strings[i]) ? "✅" : "❌");
+    }
+    
+    // Input sicuro
+    int eta = input_int_safe("Inserisci età", 0, 150);
+    float altezza = input_float_safe("Inserisci altezza (m)", 0.5f, 3.0f);
+    
+    printf("\n✅ Dati validati: Età=%d, Altezza=%.2fm\n", eta, altezza);
+    
+    return 0;
+}
+```
+
+### Validazione Stringhe e Caratteri
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+// Verifica se una stringa contiene solo lettere
+int is_alpha_string(const char* str) {
+    if (str == NULL || *str == '\0') return 0;
+    
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (!isalpha(str[i])) return 0;
+    }
+    return 1;
+}
+
+// Verifica se una stringa contiene solo cifre
+int is_digit_string(const char* str) {
+    if (str == NULL || *str == '\0') return 0;
+    
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (!isdigit(str[i])) return 0;
+    }
+    return 1;
+}
+
+// Verifica se una stringa è alfanumerica
+int is_alphanumeric_string(const char* str) {
+    if (str == NULL || *str == '\0') return 0;
+    
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (!isalnum(str[i])) return 0;
+    }
+    return 1;
+}
+
+// Verifica se una stringa è un nome valido (solo lettere e spazi)
+int is_valid_name(const char* str) {
+    if (str == NULL || *str == '\0') return 0;
+    
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (!isalpha(str[i]) && str[i] != ' ') return 0;
+    }
+    return 1;
+}
+
+// Verifica se un carattere è un operatore matematico
+int is_math_operator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '%');
+}
+
+// Verifica formato email base (contiene @ e .)
+int is_valid_email_basic(const char* email) {
+    if (email == NULL || strlen(email) < 5) return 0;
+    
+    int has_at = 0;
+    int has_dot_after_at = 0;
+    int at_position = -1;
+    
+    for (int i = 0; email[i] != '\0'; i++) {
+        if (email[i] == '@') {
+            if (has_at) return 0;  // Più di una @
+            has_at = 1;
+            at_position = i;
+        } else if (email[i] == '.' && has_at && i > at_position) {
+            has_dot_after_at = 1;
+        }
+    }
+    
+    return has_at && has_dot_after_at;
+}
+
+// Input stringa con validazione lunghezza e contenuto
+void input_string_safe(const char* prompt, char* output, int max_len, 
+                      int (*validator)(const char*), const char* error_msg) {
+    char buffer[256];
+    
+    while (1) {
+        printf("%s (max %d caratteri): ", prompt, max_len - 1);
+        
+        if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+            printf("Errore lettura input!\n");
+            continue;
+        }
+        
+        // Rimuovi newline
+        buffer[strcspn(buffer, "\n")] = 0;
+        
+        // Controllo lunghezza
+        if (strlen(buffer) >= max_len) {
+            printf("❌ Errore: stringa troppo lunga (max %d caratteri)!\n", max_len - 1);
+            continue;
+        }
+        
+        // Controllo validatore personalizzato
+        if (validator != NULL && !validator(buffer)) {
+            printf("❌ Errore: %s\n", error_msg);
+            continue;
+        }
+        
+        strcpy(output, buffer);
+        break;
+    }
+}
+
+int main() {
+    printf("=== VALIDAZIONE STRINGHE ===\n");
+    
+    // Test validatori
+    char* test_strings[] = {
+        "Mario", "123", "Mario123", "mario.rossi@email.com", 
+        "Test@", "invalidemail", "Nome Con Spazi"
+    };
+    
+    printf("\nTest validazione stringhe:\n");
+    for (int i = 0; i < 7; i++) {
+        printf("'%s':\n", test_strings[i]);
+        printf("  Solo lettere: %s\n", is_alpha_string(test_strings[i]) ? "✅" : "❌");
+        printf("  Solo cifre: %s\n", is_digit_string(test_strings[i]) ? "✅" : "❌");
+        printf("  Alfanumerico: %s\n", is_alphanumeric_string(test_strings[i]) ? "✅" : "❌");
+        printf("  Nome valido: %s\n", is_valid_name(test_strings[i]) ? "✅" : "❌");
+        printf("  Email valida: %s\n", is_valid_email_basic(test_strings[i]) ? "✅" : "❌");
+        printf("\n");
+    }
+    
+    // Input sicuro
+    char nome[50];
+    char email[100];
+    
+    input_string_safe("Inserisci nome", nome, sizeof(nome), 
+                     is_valid_name, "il nome deve contenere solo lettere e spazi");
+    
+    input_string_safe("Inserisci email", email, sizeof(email), 
+                     is_valid_email_basic, "formato email non valido");
+    
+    printf("\n✅ Dati validati:\n");
+    printf("Nome: '%s'\n", nome);
+    printf("Email: '%s'\n", email);
+    
+    return 0;
+}
+```
+
+### Controllo Overflow e Underflow
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <float.h>
+#include <errno.h>
+#include <string.h>
+
+// Conversione sicura stringa -> intero con controllo overflow
+int safe_string_to_int(const char* str, int* result) {
+    if (str == NULL || result == NULL) return -1;
+    
+    errno = 0;
+    char* endptr;
+    long val = strtol(str, &endptr, 10);
+    
+    // Controllo errori di conversione
+    if (errno == ERANGE) {
+        printf("❌ Errore: numero fuori range per int!\n");
+        return -1;
+    }
+    
+    // Controlla che tutta la stringa sia stata convertita
+    if (endptr == str || *endptr != '\0') {
+        printf("❌ Errore: formato numero non valido!\n");
+        return -1;
+    }
+    
+    // Controllo range specifico per int
+    if (val < INT_MIN || val > INT_MAX) {
+        printf("❌ Errore: numero troppo grande per int!\n");
+        return -1;
+    }
+    
+    *result = (int)val;
+    return 0;  // Successo
+}
+
+// Conversione sicura stringa -> float con controllo overflow
+int safe_string_to_float(const char* str, float* result) {
+    if (str == NULL || result == NULL) return -1;
+    
+    errno = 0;
+    char* endptr;
+    double val = strtod(str, &endptr);
+    
+    if (errno == ERANGE) {
+        if (val == 0.0) {
+            printf("❌ Errore: underflow - numero troppo piccolo!\n");
+        } else {
+            printf("❌ Errore: overflow - numero troppo grande!\n");
+        }
+        return -1;
+    }
+    
+    if (endptr == str || *endptr != '\0') {
+        printf("❌ Errore: formato float non valido!\n");
+        return -1;
+    }
+    
+    // Controllo range per float
+    if (val > FLT_MAX || val < -FLT_MAX) {
+        printf("❌ Errore: numero fuori range per float!\n");
+        return -1;
+    }
+    
+    *result = (float)val;
+    return 0;
+}
+
+// Operazioni aritmetiche sicure con controllo overflow
+int safe_add_int(int a, int b, int* result) {
+    // Controllo overflow per addizione
+    if (a > 0 && b > 0 && a > INT_MAX - b) {
+        printf("❌ Overflow: %d + %d troppo grande!\n", a, b);
+        return -1;
+    }
+    if (a < 0 && b < 0 && a < INT_MIN - b) {
+        printf("❌ Underflow: %d + %d troppo piccolo!\n", a, b);
+        return -1;
+    }
+    
+    *result = a + b;
+    return 0;
+}
+
+int safe_multiply_int(int a, int b, int* result) {
+    // Controllo overflow per moltiplicazione
+    if (a != 0 && b != 0) {
+        if (a > 0) {
+            if (b > 0 && a > INT_MAX / b) {
+                printf("❌ Overflow: %d * %d troppo grande!\n", a, b);
+                return -1;
+            }
+            if (b < 0 && b < INT_MIN / a) {
+                printf("❌ Underflow: %d * %d troppo piccolo!\n", a, b);
+                return -1;
+            }
+        } else {
+            if (b > 0 && a < INT_MIN / b) {
+                printf("❌ Underflow: %d * %d troppo piccolo!\n", a, b);
+                return -1;
+            }
+            if (b < 0 && a > INT_MAX / b) {
+                printf("❌ Overflow: %d * %d troppo grande!\n", a, b);
+                return -1;
+            }
+        }
+    }
+    
+    *result = a * b;
+    return 0;
+}
+
+int main() {
+    printf("=== CONTROLLO OVERFLOW/UNDERFLOW ===\n");
+    
+    // Test conversioni sicure
+    char* test_numbers[] = {
+        "123", "-456", "2147483647", "2147483648",  // INT_MAX + 1
+        "99999999999999999999", "abc", "12.34", "1.7e308"
+    };
+    
+    printf("\nTest conversioni sicure:\n");
+    for (int i = 0; i < 8; i++) {
+        printf("Stringa: '%s'\n", test_numbers[i]);
+        
+        int int_val;
+        if (safe_string_to_int(test_numbers[i], &int_val) == 0) {
+            printf("  ✅ Int: %d\n", int_val);
+        } else {
+            printf("  ❌ Conversione int fallita\n");
+        }
+        
+        float float_val;
+        if (safe_string_to_float(test_numbers[i], &float_val) == 0) {
+            printf("  ✅ Float: %.2f\n", float_val);
+        } else {
+            printf("  ❌ Conversione float fallita\n");
+        }
+        printf("\n");
+    }
+    
+    // Test operazioni sicure
+    printf("Test operazioni sicure:\n");
+    
+    int result;
+    
+    // Test addizione
+    if (safe_add_int(INT_MAX, 1, &result) == 0) {
+        printf("✅ INT_MAX + 1 = %d\n", result);
+    }
+    
+    if (safe_add_int(100, 200, &result) == 0) {
+        printf("✅ 100 + 200 = %d\n", result);
+    }
+    
+    // Test moltiplicazione
+    if (safe_multiply_int(INT_MAX, 2, &result) == 0) {
+        printf("✅ INT_MAX * 2 = %d\n", result);
+    }
+    
+    if (safe_multiply_int(1000, 2000, &result) == 0) {
+        printf("✅ 1000 * 2000 = %d\n", result);
+    }
+    
+    return 0;
+}
+```
+
+### Sistema di Validazione Unificato
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+// Enumerazione dei tipi di validazione
+typedef enum {
+    VALIDATE_INT,
+    VALIDATE_FLOAT,
+    VALIDATE_CHAR,
+    VALIDATE_STRING,
+    VALIDATE_EMAIL,
+    VALIDATE_ALPHA,
+    VALIDATE_NUMERIC,
+    VALIDATE_ALPHANUMERIC
+} ValidationType;
+
+// Struttura per definire regole di validazione
+typedef struct {
+    ValidationType type;
+    union {
+        struct {
+            int min;
+            int max;
+        } int_range;
+        struct {
+            float min;
+            float max;
+        } float_range;
+        struct {
+            int min_len;
+            int max_len;
+        } string_range;
+    } rules;
+    char error_message[100];
+} ValidationRule;
+
+// Validatore generico
+int validate_input(const char* input, ValidationRule* rule) {
+    if (input == NULL || rule == NULL) return 0;
+    
+    switch (rule->type) {
+        case VALIDATE_INT: {
+            for (int i = 0; input[i]; i++) {
+                if (!isdigit(input[i]) && input[i] != '-' && input[i] != '+') {
+                    strcpy(rule->error_message, "Deve essere un numero intero");
+                    return 0;
+                }
+            }
+            int val = atoi(input);
+            if (val < rule->rules.int_range.min || val > rule->rules.int_range.max) {
+                snprintf(rule->error_message, sizeof(rule->error_message),
+                        "Deve essere tra %d e %d", 
+                        rule->rules.int_range.min, rule->rules.int_range.max);
+                return 0;
+            }
+            break;
+        }
+        
+        case VALIDATE_FLOAT: {
+            int has_dot = 0;
+            for (int i = 0; input[i]; i++) {
+                if (input[i] == '.') {
+                    if (has_dot) {
+                        strcpy(rule->error_message, "Più di un punto decimale");
+                        return 0;
+                    }
+                    has_dot = 1;
+                } else if (!isdigit(input[i]) && input[i] != '-' && input[i] != '+') {
+                    strcpy(rule->error_message, "Deve essere un numero decimale");
+                    return 0;
+                }
+            }
+            float val = atof(input);
+            if (val < rule->rules.float_range.min || val > rule->rules.float_range.max) {
+                snprintf(rule->error_message, sizeof(rule->error_message),
+                        "Deve essere tra %.2f e %.2f", 
+                        rule->rules.float_range.min, rule->rules.float_range.max);
+                return 0;
+            }
+            break;
+        }
+        
+        case VALIDATE_ALPHA:
+            for (int i = 0; input[i]; i++) {
+                if (!isalpha(input[i]) && input[i] != ' ') {
+                    strcpy(rule->error_message, "Deve contenere solo lettere e spazi");
+                    return 0;
+                }
+            }
+            break;
+            
+        case VALIDATE_NUMERIC:
+            for (int i = 0; input[i]; i++) {
+                if (!isdigit(input[i])) {
+                    strcpy(rule->error_message, "Deve contenere solo cifre");
+                    return 0;
+                }
+            }
+            break;
+            
+        case VALIDATE_ALPHANUMERIC:
+            for (int i = 0; input[i]; i++) {
+                if (!isalnum(input[i])) {
+                    strcpy(rule->error_message, "Deve contenere solo lettere e numeri");
+                    return 0;
+                }
+            }
+            break;
+            
+        case VALIDATE_EMAIL: {
+            int has_at = 0, has_dot_after_at = 0, at_pos = -1;
+            for (int i = 0; input[i]; i++) {
+                if (input[i] == '@') {
+                    if (has_at) {
+                        strcpy(rule->error_message, "Email non può avere più di una @");
+                        return 0;
+                    }
+                    has_at = 1;
+                    at_pos = i;
+                } else if (input[i] == '.' && has_at && i > at_pos) {
+                    has_dot_after_at = 1;
+                }
+            }
+            if (!has_at || !has_dot_after_at) {
+                strcpy(rule->error_message, "Formato email non valido");
+                return 0;
+            }
+            break;
+        }
+        
+        case VALIDATE_STRING: {
+            int len = strlen(input);
+            if (len < rule->rules.string_range.min_len || len > rule->rules.string_range.max_len) {
+                snprintf(rule->error_message, sizeof(rule->error_message),
+                        "Lunghezza deve essere tra %d e %d caratteri", 
+                        rule->rules.string_range.min_len, rule->rules.string_range.max_len);
+                return 0;
+            }
+            break;
+        }
+    }
+    
+    return 1;  // Validazione passata
+}
+
+// Input generico con validazione
+void input_with_validation(const char* prompt, char* output, int max_len, ValidationRule* rule) {
+    char buffer[256];
+    
+    while (1) {
+        printf("%s: ", prompt);
+        
+        if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+            printf("Errore lettura input!\n");
+            continue;
+        }
+        
+        buffer[strcspn(buffer, "\n")] = 0;  // Rimuovi newline
+        
+        if (strlen(buffer) >= max_len) {
+            printf("❌ Input troppo lungo (max %d caratteri)!\n", max_len - 1);
+            continue;
+        }
+        
+        if (validate_input(buffer, rule)) {
+            strcpy(output, buffer);
+            printf("✅ Input valido!\n");
+            break;
+        } else {
+            printf("❌ %s\n", rule->error_message);
+        }
+    }
+}
+
+int main() {
+    printf("=== SISTEMA VALIDAZIONE UNIFICATO ===\n");
+    
+    char input_buffer[100];
+    
+    // Validazione età (intero 0-150)
+    ValidationRule age_rule = {
+        .type = VALIDATE_INT,
+        .rules.int_range = {0, 150}
+    };
+    input_with_validation("Inserisci età", input_buffer, sizeof(input_buffer), &age_rule);
+    int eta = atoi(input_buffer);
+    
+    // Validazione altezza (float 0.5-3.0)
+    ValidationRule height_rule = {
+        .type = VALIDATE_FLOAT,
+        .rules.float_range = {0.5f, 3.0f}
+    };
+    input_with_validation("Inserisci altezza (m)", input_buffer, sizeof(input_buffer), &height_rule);
+    float altezza = atof(input_buffer);
+    
+    // Validazione nome (solo lettere)
+    ValidationRule name_rule = {
+        .type = VALIDATE_ALPHA
+    };
+    char nome[50];
+    input_with_validation("Inserisci nome", nome, sizeof(nome), &name_rule);
+    
+    // Validazione email
+    ValidationRule email_rule = {
+        .type = VALIDATE_EMAIL
+    };
+    char email[100];
+    input_with_validation("Inserisci email", email, sizeof(email), &email_rule);
+    
+    // Validazione codice (alfanumerico 5-10 caratteri)
+    ValidationRule code_rule = {
+        .type = VALIDATE_ALPHANUMERIC,
+        .rules.string_range = {5, 10}
+    };
+    char codice[20];
+    input_with_validation("Inserisci codice", codice, sizeof(codice), &code_rule);
+    
+    printf("\n=== DATI VALIDATI ===\n");
+    printf("Età: %d anni\n", eta);
+    printf("Altezza: %.2f m\n", altezza);
+    printf("Nome: %s\n", nome);
+    printf("Email: %s\n", email);
+    printf("Codice: %s\n", codice);
+    
+    return 0;
+}
+```
+
+### Macro per Validazione Rapida
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Macro per controlli rapidi
+#define VALIDATE_RANGE(var, min, max, type) \
+    do { \
+        if ((var) < (min) || (var) > (max)) { \
+            printf("❌ Errore: " #var " deve essere tra " #min " e " #max "\n"); \
+            return -1; \
+        } \
+        printf("✅ " #var " = " type " valido\n", (var)); \
+    } while(0)
+
+#define VALIDATE_NOT_NULL(ptr) \
+    do { \
+        if ((ptr) == NULL) { \
+            printf("❌ Errore: " #ptr " è NULL!\n"); \
+            return -1; \
+        } \
+    } while(0)
+
+#define VALIDATE_STRING_LENGTH(str, min_len, max_len) \
+    do { \
+        int len = strlen(str); \
+        if (len < (min_len) || len > (max_len)) { \
+            printf("❌ Errore: " #str " deve avere lunghezza tra %d e %d (attuale: %d)\n", \
+                   (min_len), (max_len), len); \
+            return -1; \
+        } \
+        printf("✅ " #str " = '%s' (lunghezza %d) valida\n", (str), len); \
+    } while(0)
+
+#define VALIDATE_POSITIVE(var) \
+    do { \
+        if ((var) <= 0) { \
+            printf("❌ Errore: " #var " deve essere positivo!\n"); \
+            return -1; \
+        } \
+    } while(0)
+
+// Funzione di esempio che usa le macro di validazione
+int process_user_data(const char* nome, int eta, float stipendio, char* codice_fiscale) {
+    printf("=== VALIDAZIONE CON MACRO ===\n");
+    
+    // Validazioni con macro
+    VALIDATE_NOT_NULL(nome);
+    VALIDATE_NOT_NULL(codice_fiscale);
+    
+    VALIDATE_STRING_LENGTH(nome, 2, 50);
+    VALIDATE_STRING_LENGTH(codice_fiscale, 16, 16);  // Codice fiscale italiano
+    
+    VALIDATE_RANGE(eta, 18, 100, "%d");
+    VALIDATE_RANGE(stipendio, 500.0f, 100000.0f, "%.2f");
+    
+    VALIDATE_POSITIVE(stipendio);
+    
+    printf("\n✅ Tutti i dati sono validi!\n");
+    return 0;
+}
+
+int main() {
+    // Test con dati validi
+    printf("Test 1 - Dati validi:\n");
+    if (process_user_data("Mario Rossi", 30, 2500.50f, "RSSMRA80A01H501X") == 0) {
+        printf("Elaborazione completata con successo!\n");
+    }
+    
+    printf("\n" "="*50 "\n");
+    
+    // Test con dati non validi
+    printf("Test 2 - Età non valida:\n");
+    process_user_data("Luigi Verdi", 200, 3000.0f, "VRDLGU75B02H501Y");
+    
+    printf("\n" "="*50 "\n");
+    
+    printf("Test 3 - Nome troppo corto:\n");
+    process_user_data("A", 25, 2000.0f, "BNCMRC85C03H501Z");
+    
+    printf("\n" "="*50 "\n");
+    
+    printf("Test 4 - Codice fiscale lunghezza sbagliata:\n");
+    process_user_data("Anna Bianchi", 35, 2800.0f, "BNCANN85");
+    
+    return 0;
+}
+```
+
+## CASTING E CONVERSIONI
+
+### Casting Base tra Tipi Primitivi
+```c
+#include <stdio.h>
+
+int main() {
+    // Conversioni numeriche esplicite
+    int intero = 42;
+    float decimale = 3.14f;
+    double preciso = 2.718281828;
+    char carattere = 'A';
+    
+    // Int -> Float/Double
+    float f1 = (float)intero;           // 42.0f
+    double d1 = (double)intero;         // 42.0
+    
+    // Float/Double -> Int (troncamento)
+    int i1 = (int)decimale;             // 3 (perde parte decimale)
+    int i2 = (int)preciso;              // 2
+    
+    // Char -> Int (valore ASCII)
+    int ascii = (int)carattere;         // 65
+    
+    // Int -> Char (modulo 256)
+    char c1 = (char)65;                 // 'A'
+    char c2 = (char)300;                // 44 (300 % 256)
+    
+    // Unsigned/Signed conversions
+    int negativo = -1;
+    unsigned int positivo = (unsigned int)negativo;  // 4294967295
+    
+    printf("Conversioni base:\n");
+    printf("int %d -> float %.2f\n", intero, f1);
+    printf("float %.2f -> int %d\n", decimale, i1);
+    printf("char '%c' -> int %d\n", carattere, ascii);
+    printf("int %d -> unsigned %u\n", negativo, positivo);
+    
+    return 0;
+}
+```
+
+### Casting di Puntatori
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    // Puntatori a tipi diversi
+    int numero = 0x41424344;           // "ABCD" in little-endian
+    int* ptr_int = &numero;
+    
+    // Casting puntatori per accesso byte-level
+    char* ptr_char = (char*)ptr_int;
+    unsigned char* ptr_uchar = (unsigned char*)ptr_int;
+    void* ptr_void = (void*)ptr_int;
+    
+    printf("Valore originale: 0x%08X\n", numero);
+    printf("Bytes individuali:\n");
+    for (int i = 0; i < sizeof(int); i++) {
+        printf("  Byte %d: 0x%02X ('%c')\n", i, ptr_uchar[i], 
+               (ptr_char[i] >= 32 && ptr_char[i] <= 126) ? ptr_char[i] : '.');
+    }
+    
+    // Casting void* -> tipo specifico
+    int* restored = (int*)ptr_void;
+    printf("Restored value: 0x%08X\n", *restored);
+    
+    // Array casting
+    float array_float[] = {1.0f, 2.0f, 3.0f, 4.0f};
+    int* array_as_int = (int*)array_float;
+    
+    printf("\nFloat array come int:\n");
+    for (int i = 0; i < 4; i++) {
+        printf("float[%d] = %.1f -> int[%d] = 0x%08X\n", 
+               i, array_float[i], i, array_as_int[i]);
+    }
+    
+    return 0;
+}
+```
+
+### Casting per Networking (Essenziale per TCP/UDP)
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+int main() {
+    // === CASTING SOCKADDR ===
+    struct sockaddr_in server_addr;
+    struct sockaddr* generic_addr;
+    
+    // Inizializza sockaddr_in
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(8080);        // Host to Network Short
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    
+    // ⭐ CASTING FONDAMENTALE per bind/connect/accept
+    generic_addr = (struct sockaddr*)&server_addr;
+    
+    printf("=== CASTING NETWORKING ===\n");
+    
+    // === CONVERSIONI BYTE ORDER ===
+    uint16_t port_host = 8080;
+    uint32_t ip_host = 0x7F000001;  // 127.0.0.1
+    
+    uint16_t port_network = htons(port_host);   // Host to Network Short
+    uint32_t ip_network = htonl(ip_host);       // Host to Network Long
+    
+    printf("Porta - Host: %u, Network: %u\n", port_host, port_network);
+    printf("IP - Host: 0x%08X, Network: 0x%08X\n", ip_host, ip_network);
+    
+    // Reverse conversion
+    uint16_t port_back = ntohs(port_network);   // Network to Host Short
+    uint32_t ip_back = ntohl(ip_network);       // Network to Host Long
+    
+    printf("Reverse - Porta: %u, IP: 0x%08X\n", port_back, ip_back);
+    
+    // === CONVERSIONI IP STRING ===
+    char ip_string[] = "192.168.1.100";
+    struct in_addr addr;
+    
+    // String -> Binary
+    if (inet_aton(ip_string, &addr)) {
+        printf("IP '%s' -> Binary: 0x%08X\n", ip_string, ntohl(addr.s_addr));
+    }
+    
+    // Binary -> String
+    char* ip_converted = inet_ntoa(addr);
+    printf("Binary -> IP: '%s'\n", ip_converted);
+    
+    // === CASTING PER ACCEPT ===
+    struct sockaddr_in client_addr;
+    socklen_t client_len = sizeof(client_addr);
+    
+    // Simulazione accept (normalmente restituisce fd)
+    printf("\nCasting per accept:\n");
+    printf("accept(server_fd, (struct sockaddr*)&client_addr, &client_len);\n");
+    
+    // === BUFFER CASTING PER RECV/SEND ===
+    int data_to_send = 0x12345678;
+    char* buffer = (char*)&data_to_send;
+    
+    printf("Invio int come buffer: ");
+    for (int i = 0; i < sizeof(int); i++) {
+        printf("%02X ", (unsigned char)buffer[i]);
+    }
+    printf("\n");
+    
+    return 0;
+}
+```
+
+### Casting per Stringhe e Buffer (TCP/UDP)
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+int main() {
+    printf("=== CASTING STRINGHE E BUFFER ===\n");
+    
+    // === RIMOZIONE NEWLINE (comune in server TCP) ===
+    char buffer[256] = "Hello World\n";
+    int len = strlen(buffer);
+    
+    printf("Prima: '%s' (len=%d)\n", buffer, len);
+    
+    // Metodo 1: strcspn (trova primo \n)
+    buffer[strcspn(buffer, "\n")] = '\0';
+    printf("Dopo strcspn: '%s'\n", buffer);
+    
+    // Metodo 2: per recv() con bytes_read
+    char buffer2[256];
+    int bytes_read = 12; // Simulazione recv()
+    strcpy(buffer2, "Hello World\n");
+    
+    buffer2[bytes_read - 1] = '\0';  // Rimuovi ultimo char se \n
+    printf("Con bytes_read: '%s'\n", buffer2);
+    
+    // Metodo 3: manuale
+    char buffer3[] = "Test message\n\r";
+    len = strlen(buffer3);
+    while (len > 0 && (buffer3[len-1] == '\n' || buffer3[len-1] == '\r')) {
+        buffer3[--len] = '\0';
+    }
+    printf("Pulizia manuale: '%s'\n", buffer3);
+    
+    // === CONVERSIONI STRINGA <-> NUMERO ===
+    char num_str[] = "12345";
+    char float_str[] = "3.14159";
+    
+    // String -> Number
+    int numero = atoi(num_str);
+    long lungo = atol(num_str);
+    float decimale = atof(float_str);
+    
+    printf("\nConversioni string->number:\n");
+    printf("'%s' -> int: %d\n", num_str, numero);
+    printf("'%s' -> long: %ld\n", num_str, lungo);
+    printf("'%s' -> float: %.3f\n", float_str, decimale);
+    
+    // Number -> String
+    char result[100];
+    sprintf(result, "%d", numero);
+    printf("int %d -> string: '%s'\n", numero, result);
+    
+    snprintf(result, sizeof(result), "%.2f", decimale);
+    printf("float %.3f -> string: '%s'\n", decimale, result);
+    
+    // === CASTING CHAR/UNSIGNED CHAR ===
+    char signed_char = -1;
+    unsigned char unsigned_char = (unsigned char)signed_char;
+    
+    printf("\nCasting char:\n");
+    printf("signed char: %d, unsigned char: %u\n", signed_char, unsigned_char);
+    
+    // Utile per protocolli binari
+    unsigned char protocol_byte = 0xFF;
+    printf("Protocol byte: 0x%02X (%u)\n", protocol_byte, protocol_byte);
+    
+    return 0;
+}
+```
+
+### Casting per Memoria e File Descriptor
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+
+int main() {
+    printf("=== CASTING MEMORIA E FILE ===\n");
+    
+    // === CASTING MALLOC/MEMORY ===
+    void* raw_memory = malloc(1024);
+    if (raw_memory == NULL) {
+        perror("malloc failed");
+        return 1;
+    }
+    
+    // Cast per diversi tipi di accesso
+    char* char_ptr = (char*)raw_memory;
+    int* int_ptr = (int*)raw_memory;
+    float* float_ptr = (float*)raw_memory;
+    
+    // Scrittura come int
+    *int_ptr = 0x41424344;
+    
+    // Lettura come char array
+    printf("Memory as chars: ");
+    for (int i = 0; i < 4; i++) {
+        printf("'%c' ", char_ptr[i]);
+    }
+    printf("\n");
+    
+    // Lettura come float (interpretazione binaria)
+    printf("Memory as float: %f\n", *float_ptr);
+    
+    free(raw_memory);
+    
+    // === CASTING FILE DESCRIPTOR ===
+    int fd = open("/dev/null", O_WRONLY);
+    if (fd != -1) {
+        // File descriptor è un int, ma spesso serve casting per certe funzioni
+        printf("File descriptor: %d\n", fd);
+        
+        // Simulazione uso in select()
+        fd_set write_fds;
+        FD_ZERO(&write_fds);
+        FD_SET(fd, &write_fds);  // Automatico, ma fd è trattato come int
+        
+        close(fd);
+    }
+    
+    // === CASTING PER MMAP ===
+    size_t page_size = 4096;
+    void* mapped = mmap(NULL, page_size, PROT_READ | PROT_WRITE, 
+                       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    
+    if (mapped != MAP_FAILED) {
+        // Cast per uso specifico
+        int* mapped_ints = (int*)mapped;
+        char* mapped_chars = (char*)mapped;
+        
+        // Uso come array di int
+        mapped_ints[0] = 100;
+        mapped_ints[1] = 200;
+        
+        // Lettura come char
+        printf("Mapped memory: %d %d\n", mapped_chars[0], mapped_chars[4]);
+        
+        munmap(mapped, page_size);
+    }
+    
+    return 0;
+}
+```
+
+### Casting per Struct e Union
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Esempio pratico: protocollo di rete
+typedef struct {
+    uint8_t type;       // Tipo messaggio
+    uint8_t flags;      // Flag
+    uint16_t length;    // Lunghezza payload
+    uint32_t sequence;  // Numero sequenza
+} PacketHeader;
+
+typedef struct {
+    PacketHeader header;
+    char payload[256];
+} Packet;
+
+// Union per conversioni rapide
+typedef union {
+    uint32_t as_int;
+    float as_float;
+    char as_bytes[4];
+} Converter;
+
+int main() {
+    printf("=== CASTING STRUCT E UNION ===\n");
+    
+    // === CASTING STRUCT <-> BUFFER ===
+    Packet packet;
+    packet.header.type = 1;
+    packet.header.flags = 0x80;
+    packet.header.length = htons(10);  // Network byte order
+    packet.header.sequence = htonl(12345);
+    strcpy(packet.payload, "Hello");
+    
+    // Cast struct -> buffer per invio
+    char* send_buffer = (char*)&packet;
+    int packet_size = sizeof(PacketHeader) + strlen(packet.payload);
+    
+    printf("Packet size: %d bytes\n", packet_size);
+    printf("Header bytes: ");
+    for (int i = 0; i < sizeof(PacketHeader); i++) {
+        printf("%02X ", (unsigned char)send_buffer[i]);
+    }
+    printf("\n");
+    
+    // === RICEZIONE E CASTING INVERSO ===
+    char received_buffer[sizeof(Packet)];
+    memcpy(received_buffer, send_buffer, packet_size);
+    
+    // Cast buffer -> struct
+    PacketHeader* received_header = (PacketHeader*)received_buffer;
+    char* received_payload = received_buffer + sizeof(PacketHeader);
+    
+    printf("Received - Type: %u, Flags: 0x%02X\n", 
+           received_header->type, received_header->flags);
+    printf("Length: %u, Sequence: %u\n", 
+           ntohs(received_header->length), ntohl(received_header->sequence));
+    printf("Payload: '%s'\n", received_payload);
+    
+    // === UNION PER CONVERSIONI ===
+    Converter conv;
+    
+    // Float -> bytes
+    conv.as_float = 3.14159f;
+    printf("\nFloat 3.14159 as bytes: ");
+    for (int i = 0; i < 4; i++) {
+        printf("0x%02X ", (unsigned char)conv.as_bytes[i]);
+    }
+    printf("\n");
+    
+    // Int -> float (interpretazione binaria)
+    conv.as_int = 0x40490FDB;  // IEEE 754 per π
+    printf("0x40490FDB as float: %f\n", conv.as_float);
+    
+    // === CASTING ARRAY DI STRUCT ===
+    PacketHeader headers[3] = {
+        {1, 0x01, htons(10), htonl(100)},
+        {2, 0x02, htons(20), htonl(200)},
+        {3, 0x03, htons(30), htonl(300)}
+    };
+    
+    // Cast array -> buffer continuo
+    char* headers_buffer = (char*)headers;
+    int total_size = sizeof(headers);
+    
+    printf("Headers array as buffer (%d bytes):\n", total_size);
+    for (int i = 0; i < total_size; i++) {
+        if (i % 16 == 0) printf("\n%04X: ", i);
+        printf("%02X ", (unsigned char)headers_buffer[i]);
+    }
+    printf("\n");
+    
+    return 0;
+}
+```
+
+### Casting Avanzato per Sistemi
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <time.h>
+
+// Casting per manipolazione bit-level
+typedef union {
+    struct {
+        unsigned bit0 : 1;
+        unsigned bit1 : 1;
+        unsigned bit2 : 1;
+        unsigned bit3 : 1;
+        unsigned bit4 : 1;
+        unsigned bit5 : 1;
+        unsigned bit6 : 1;
+        unsigned bit7 : 1;
+    } bits;
+    uint8_t byte;
+} BitField;
+
+int main() {
+    printf("=== CASTING AVANZATO ===\n");
+    
+    // === CASTING FUNCTION POINTERS ===
+    int (*func_ptr)(int, int) = NULL;
+    void* generic_func = NULL;
+    
+    // Simulazione casting function pointer
+    printf("Function pointer size: %zu bytes\n", sizeof(func_ptr));
+    
+    // === CASTING PER BIT MANIPULATION ===
+    BitField bf;
+    bf.byte = 0b10101010;  // 170 in decimale
+    
+    printf("Byte 0x%02X as bits: ", bf.byte);
+    printf("%d%d%d%d %d%d%d%d\n", 
+           bf.bits.bit7, bf.bits.bit6, bf.bits.bit5, bf.bits.bit4,
+           bf.bits.bit3, bf.bits.bit2, bf.bits.bit1, bf.bits.bit0);
+    
+    // === CASTING ARRAY MULTIDIMENSIONALE ===
+    int matrix[3][4] = {
+        {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 10, 11, 12}
+    };
+    
+    // Cast a array monodimensionale
+    int* linear = (int*)matrix;
+    printf("Matrix as linear array: ");
+    for (int i = 0; i < 12; i++) {
+        printf("%d ", linear[i]);
+    }
+    printf("\n");
+    
+    // === CASTING TIME_T ===
+    time_t timestamp = time(NULL);
+    long long timestamp_ll = (long long)timestamp;
+    
+    printf("Timestamp: %ld (as long long: %lld)\n", timestamp, timestamp_ll);
+    
+    // === CASTING PER PROTOCOLLI ===
+    // Simulazione header TCP (semplificato)
+    struct tcp_header {
+        uint16_t source_port;
+        uint16_t dest_port;
+        uint32_t seq_num;
+        uint32_t ack_num;
+        uint8_t flags;
+    } __attribute__((packed));  // Evita padding
+    
+    struct tcp_header tcp;
+    tcp.source_port = htons(8080);
+    tcp.dest_port = htons(80);
+    tcp.seq_num = htonl(12345);
+    tcp.ack_num = htonl(67890);
+    tcp.flags = 0x18;  // PSH + ACK
+    
+    // Cast per invio raw
+    unsigned char* raw_tcp = (unsigned char*)&tcp;
+    printf("TCP header (%zu bytes): ", sizeof(tcp));
+    for (size_t i = 0; i < sizeof(tcp); i++) {
+        printf("%02X ", raw_tcp[i]);
+    }
+    printf("\n");
+    
+    // === CASTING VOLATILE (per hardware) ===
+    volatile uint32_t* hardware_register = (volatile uint32_t*)0x40000000;
+    // In un sistema reale, questo accede a un registro hardware
+    printf("Hardware register cast: %p\n", (void*)hardware_register);
+    
+    return 0;
+}
+```
+
+### Macro per Casting Comune
+```c
+#include <stdio.h>
+#include <stdint.h>
+
+// Macro per casting frequenti in networking
+#define SOCKADDR_CAST(addr) ((struct sockaddr*)(addr))
+#define SOCKADDR_IN_CAST(addr) ((struct sockaddr_in*)(addr))
+
+// Macro per conversione byte order
+#define HOST_TO_NET16(x) htons(x)
+#define HOST_TO_NET32(x) htonl(x)
+#define NET_TO_HOST16(x) ntohs(x)
+#define NET_TO_HOST32(x) ntohl(x)
+
+// Macro per casting buffer
+#define BUFFER_TO_INT(buf) (*((int*)(buf)))
+#define BUFFER_TO_FLOAT(buf) (*((float*)(buf)))
+#define INT_TO_BUFFER(val) ((char*)&(val))
+
+// Macro per pulizia stringhe
+#define REMOVE_NEWLINE(str) do { \
+    (str)[strcspn((str), "\n\r")] = '\0'; \
+} while(0)
+
+#define NULL_TERMINATE(buf, len) do { \
+    (buf)[(len)] = '\0'; \
+} while(0)
+
+// Macro per casting sicuro
+#define SAFE_CAST(type, value) ((type)(value))
+#define PTR_CAST(type, ptr) ((type*)(ptr))
+#define VOID_CAST(ptr) ((void*)(ptr))
+
+int main() {
+    printf("=== MACRO PER CASTING ===\n");
+    
+    // Esempio uso macro networking
+    struct sockaddr_in addr;
+    struct sockaddr* generic = SOCKADDR_CAST(&addr);
+    printf("Sockaddr cast: %p -> %p\n", (void*)&addr, (void*)generic);
+    
+    // Esempio byte order
+    uint16_t port = 8080;
+    uint16_t net_port = HOST_TO_NET16(port);
+    printf("Port %u -> network: %u\n", port, net_port);
+    
+    // Esempio buffer casting
+    int value = 0x12345678;
+    char* buffer = INT_TO_BUFFER(value);
+    int restored = BUFFER_TO_INT(buffer);
+    printf("Value: 0x%08X -> buffer -> restored: 0x%08X\n", value, restored);
+    
+    // Esempio pulizia stringa
+    char test_str[] = "Hello World\n";
+    printf("Before: '%s'\n", test_str);
+    REMOVE_NEWLINE(test_str);
+    printf("After: '%s'\n", test_str);
+    
+    return 0;
+}
+```
+
+### Casting per Debugging e Ispezione
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Funzione per dump hex di qualsiasi tipo
+void hex_dump(const void* data, size_t size, const char* label) {
+    const unsigned char* bytes = (const unsigned char*)data;
+    
+    printf("%s (%zu bytes):\n", label, size);
+    for (size_t i = 0; i < size; i++) {
+        if (i % 16 == 0) printf("%04zX: ", i);
+        printf("%02X ", bytes[i]);
+        if ((i + 1) % 16 == 0 || i == size - 1) {
+            // Aggiungi rappresentazione ASCII
+            size_t start = i - (i % 16);
+            printf(" |");
+            for (size_t j = start; j <= i; j++) {
+                char c = bytes[j];
+                printf("%c", (c >= 32 && c <= 126) ? c : '.');
+            }
+            printf("|\n");
+        }
+    }
+}
+
+// Casting per ispezione strutture
+typedef struct {
+    int id;
+    float value;
+    char name[16];
+} TestStruct;
+
+int main() {
+    printf("=== CASTING PER DEBUGGING ===\n");
+    
+    // Test con vari tipi
+    int number = 0x12345678;
+    float pi = 3.14159f;
+    char text[] = "Hello";
+    
+    hex_dump(&number, sizeof(number), "Integer 0x12345678");
+    hex_dump(&pi, sizeof(pi), "Float 3.14159");
+    hex_dump(text, strlen(text), "String 'Hello'");
+    
+    // Test con struct
+    TestStruct ts = {42, 2.71828f, "TestName"};
+    hex_dump(&ts, sizeof(ts), "TestStruct");
+    
+    // Casting per accesso diretto ai campi
+    char* struct_bytes = (char*)&ts;
+    int* id_ptr = (int*)struct_bytes;
+    float* value_ptr = (float*)(struct_bytes + sizeof(int));
+    char* name_ptr = struct_bytes + sizeof(int) + sizeof(float);
+    
+    printf("\nDirect field access via casting:\n");
+    printf("ID: %d (at offset 0)\n", *id_ptr);
+    printf("Value: %.5f (at offset %zu)\n", *value_ptr, sizeof(int));
+    printf("Name: '%.16s' (at offset %zu)\n", name_ptr, sizeof(int) + sizeof(float));
+    
+    // Verifica allineamento memoria
+    printf("\nMemory alignment:\n");
+    printf("Struct size: %zu bytes\n", sizeof(ts));
+    printf("Fields sum: %zu bytes\n", sizeof(int) + sizeof(float) + 16);
+    printf("Padding: %zu bytes\n", sizeof(ts) - (sizeof(int) + sizeof(float) + 16));
+    
+    return 0;
+}
 ```

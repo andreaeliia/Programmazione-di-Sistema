@@ -1,6 +1,442 @@
-# Server TCP con Select - Riferimento Completo
+# Server TCP - Riferimento Completo
 
-## 🎯 Concetti Fondamentali
+## 🎯 Panoramica Approcci Server TCP
+
+### **Tipi di Server TCP**
+
+| **Tipo** | **Concorrenza** | **Complessità** | **Scalabilità** | **Uso Memoria** |
+|----------|----------------|-----------------|-----------------|-----------------|
+| **Sequenziale** | ❌ No | ✅ Bassa | ❌ Limitata | ✅ Minimo |
+| **Fork** | ✅ Processi | ⚠️ Media | ⚠️ Media | ❌ Alto |
+| **Thread** | ✅ Thread | ⚠️ Media | ✅ Buona | ⚠️ Medio |
+| **Select** | ✅ I/O Multiplexing | ❌ Alta | ✅ Ottima | ✅ Minimo |
+
+---
+
+## 🔄 SERVER SEQUENZIALE
+
+### **Concetti Fondamentali**
+- **Mono-client**: gestisce UN solo client alla volta
+- **Blocking**: si blocca su ogni operazione I/O
+- **Semplice**: codice lineare e intuitivo
+- **Limitato**: altri client devono attendere
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <time.h>
+
+#define PORT 8080
+#define BUFFER_SIZE 1024
+
+int main() {
+    int server_fd, client_fd;
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t client_len = sizeof(client_addr);
+    char buffer[BUFFER_SIZE];
+    int opt = 1;
+    
+    // 1. CREAZIONE SOCKET
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd < 0) {
+        perror("socket failed");
+        exit(EXIT_FAILURE);
+    }
+    
+    // Riuso indirizzo
+    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    
+    // 2. CONFIGURAZIONE INDIRIZZO
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(PORT);
+    
+    // 3. BIND E LISTEN
+    if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
+    
+    if (listen(server_fd, 5) < 0) {
+        perror("listen failed");
+        exit(EXIT_FAILURE);
+    }
+    
+    printf("🔄 Server Sequenziale avviato su porta %d\n", PORT);
+    printf("⚠️  Gestisce UN solo client alla volta\n\n");
+    
+    // 4. MAIN LOOP - UN CLIENT ALLA VOLTA
+    while (1) {
+        printf("⏳ Aspettando nuova connessione...\n");
+        
+        // BLOCCA fino a nuova connessione
+        client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
+        if (client_fd < 0) {
+            perror("accept failed");
+            continue;
+        }
+        
+        printf("✅ Client connesso: %s:%d [fd=%d]\n", 
+               inet_ntoa(client_addr.sin_addr), 
+               ntohs(client_addr.sin_port), client_fd);
+        
+        // Messaggio benvenuto
+        send(client_fd, "🔄 Server Sequenziale - Sei l'unico client!\n", 44, 0);
+        
+        // 5. GESTIONE CLIENT (fino a disconnessione)
+        while (1) {
+            int bytes_read = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
+            
+            if (bytes_read <= 0) {
+                if (bytes_read == 0) {
+                    printf("👋 Client [%d] disconnesso\n", client_fd);
+                } else {
+                    perror("recv error");
+                }
+                break;  // Esci dal loop client
+            }
+            
+            buffer[bytes_read] = '\0';
+            printf("📩 Ricevuto: '%s'\n", buffer);
+            
+            // Echo al client
+            snprintf(buffer, BUFFER_SIZE, "✅ Echo: %s", buffer);
+            send(client_fd, buffer, strlen(buffer), 0);
+        }
+        
+        // 6. CHIUDI CONNESSIONE CLIENT
+        close(client_fd);
+        printf("🔒 Connessione chiusa, pronto per nuovo client\n\n");
+    }
+    
+    close(server_fd);
+    return 0;
+}
+```
+
+---
+
+## 🍴 SERVER CON FORK
+
+### **Concetti Fondamentali**
+- **Multi-processo**: crea processo figlio per ogni client
+- **Isolamento**: ogni client ha processo dedicato
+- **Robustezza**: crash di un client non influenza altri
+- **Overhead**: alto consumo memoria per processi
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <errno.h>
+
+#define PORT 8080
+#define BUFFER_SIZE 1024
+
+// Gestore segnale per processi zombie
+void sigchld_handler(int sig) {
+    // Raccoglie processi figli terminati
+    while (waitpid(-1, NULL, WNOHANG) > 0);
+}
+
+// Funzione per gestire singolo client (processo figlio)
+void gestisci_client(int client_fd, struct sockaddr_in client_addr) {
+    char buffer[BUFFER_SIZE];
+    pid_t pid = getpid();
+    
+    printf("🍴 Processo figlio [PID=%d] gestisce client %s:%d\n", 
+           pid, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+    
+    // Messaggio benvenuto
+    snprintf(buffer, BUFFER_SIZE, 
+            "🍴 Benvenuto! Sei gestito dal processo %d\n", pid);
+    send(client_fd, buffer, strlen(buffer), 0);
+    
+    // Loop gestione messaggi
+    while (1) {
+        int bytes_read = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
+        
+        if (bytes_read <= 0) {
+            if (bytes_read == 0) {
+                printf("👋 [PID=%d] Client disconnesso\n", pid);
+            } else {
+                printf("❌ [PID=%d] Errore recv: %s\n", pid, strerror(errno));
+            }
+            break;
+        }
+        
+        buffer[bytes_read] = '\0';
+        printf("📩 [PID=%d] Ricevuto: '%s'\n", pid, buffer);
+        
+        // Elaborazione (simula lavoro)
+        sleep(1);
+        
+        // Risposta al client
+        snprintf(buffer, BUFFER_SIZE, 
+                "✅ [Processo %d] Elaborato: %s", pid, buffer);
+        send(client_fd, buffer, strlen(buffer), 0);
+    }
+    
+    close(client_fd);
+    printf("🔒 [PID=%d] Processo figlio terminato\n", pid);
+    exit(0);  // Termina processo figlio
+}
+
+int main() {
+    int server_fd, client_fd;
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t client_len = sizeof(client_addr);
+    int opt = 1;
+    pid_t pid;
+    
+    // Installa gestore segnale per processi zombie
+    signal(SIGCHLD, sigchld_handler);
+    
+    // 1. CREAZIONE SOCKET
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd < 0) {
+        perror("socket failed");
+        exit(EXIT_FAILURE);
+    }
+    
+    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    
+    // 2. BIND E LISTEN
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(PORT);
+    
+    bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+    listen(server_fd, 10);
+    
+    printf("🍴 Server Fork avviato su porta %d\n", PORT);
+    printf("👨‍👧‍👦 Ogni client avrà il suo processo dedicato\n\n");
+    
+    // 3. MAIN LOOP - ACCETTA E FORKA
+    while (1) {
+        printf("⏳ Aspettando connessioni...\n");
+        
+        client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
+        if (client_fd < 0) {
+            perror("accept failed");
+            continue;
+        }
+        
+        printf("✅ Nuova connessione da %s:%d\n", 
+               inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+        
+        // 4. FORK - CREA PROCESSO FIGLIO
+        pid = fork();
+        
+        if (pid == 0) {
+            // PROCESSO FIGLIO
+            close(server_fd);  // Figlio non ha bisogno del server socket
+            gestisci_client(client_fd, client_addr);
+            // gestisci_client termina con exit(0)
+        }
+        else if (pid > 0) {
+            // PROCESSO PADRE
+            close(client_fd);  // Padre non ha bisogno del client socket
+            printf("🔄 Processo padre continua ad accettare connessioni\n");
+        }
+        else {
+            // ERRORE FORK
+            perror("fork failed");
+            close(client_fd);
+        }
+    }
+    
+    close(server_fd);
+    return 0;
+}
+```
+
+---
+
+## 🧵 SERVER CON THREAD
+
+### **Concetti Fondamentali**
+- **Multi-thread**: crea thread per ogni client
+- **Condivisione**: thread condividono memoria del processo
+- **Efficienza**: minor overhead rispetto ai processi
+- **Sincronizzazione**: serve attenzione ai dati condivisi
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <pthread.h>
+#include <errno.h>
+
+#define PORT 8080
+#define BUFFER_SIZE 1024
+#define MAX_CLIENTS 50
+
+// Struttura per passare dati al thread
+typedef struct {
+    int client_fd;
+    struct sockaddr_in client_addr;
+    int thread_id;
+} ThreadData;
+
+// Contatore thread attivi (condiviso)
+int active_threads = 0;
+pthread_mutex_t thread_count_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+// Funzione thread per gestire client
+void* gestisci_client_thread(void* arg) {
+    ThreadData* data = (ThreadData*)arg;
+    int client_fd = data->client_fd;
+    int thread_id = data->thread_id;
+    char buffer[BUFFER_SIZE];
+    
+    // Incrementa contatore thread
+    pthread_mutex_lock(&thread_count_mutex);
+    active_threads++;
+    printf("🧵 Thread %d avviato per client %s:%d (Attivi: %d)\n", 
+           thread_id, inet_ntoa(data->client_addr.sin_addr), 
+           ntohs(data->client_addr.sin_port), active_threads);
+    pthread_mutex_unlock(&thread_count_mutex);
+    
+    // Messaggio benvenuto
+    snprintf(buffer, BUFFER_SIZE, 
+            "🧵 Benvenuto! Sei gestito dal thread %d\n", thread_id);
+    send(client_fd, buffer, strlen(buffer), 0);
+    
+    // Loop gestione messaggi
+    while (1) {
+        int bytes_read = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
+        
+        if (bytes_read <= 0) {
+            if (bytes_read == 0) {
+                printf("👋 [Thread %d] Client disconnesso\n", thread_id);
+            } else {
+                printf("❌ [Thread %d] Errore recv: %s\n", thread_id, strerror(errno));
+            }
+            break;
+        }
+        
+        buffer[bytes_read] = '\0';
+        printf("📩 [Thread %d] Ricevuto: '%s'\n", thread_id, buffer);
+        
+        // Elaborazione (simula lavoro)
+        usleep(500000);  // 0.5 secondi
+        
+        // Risposta
+        snprintf(buffer, BUFFER_SIZE, 
+                "✅ [Thread %d] Elaborato: %s", thread_id, buffer);
+        send(client_fd, buffer, strlen(buffer), 0);
+    }
+    
+    // Cleanup
+    close(client_fd);
+    
+    // Decrementa contatore
+    pthread_mutex_lock(&thread_count_mutex);
+    active_threads--;
+    printf("🔒 [Thread %d] Terminato (Attivi: %d)\n", thread_id, active_threads);
+    pthread_mutex_unlock(&thread_count_mutex);
+    
+    free(data);  // Libera memoria passata al thread
+    pthread_exit(NULL);
+}
+
+int main() {
+    int server_fd, client_fd;
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t client_len = sizeof(client_addr);
+    int opt = 1;
+    pthread_t thread;
+    int thread_counter = 0;
+    
+    // 1. CREAZIONE SOCKET
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd < 0) {
+        perror("socket failed");
+        exit(EXIT_FAILURE);
+    }
+    
+    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    
+    // 2. BIND E LISTEN
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(PORT);
+    
+    bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+    listen(server_fd, MAX_CLIENTS);
+    
+    printf("🧵 Server Thread avviato su porta %d\n", PORT);
+    printf("🔢 Gestisce fino a %d client contemporaneamente\n\n", MAX_CLIENTS);
+    
+    // 3. MAIN LOOP - ACCETTA E CREA THREAD
+    while (1) {
+        printf("⏳ Aspettando connessioni...\n");
+        
+        client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
+        if (client_fd < 0) {
+            perror("accept failed");
+            continue;
+        }
+        
+        printf("✅ Nuova connessione da %s:%d\n", 
+               inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+        
+        // Controllo limite thread
+        pthread_mutex_lock(&thread_count_mutex);
+        if (active_threads >= MAX_CLIENTS) {
+            pthread_mutex_unlock(&thread_count_mutex);
+            printf("❌ Troppi client attivi, connessione rifiutata\n");
+            send(client_fd, "Server pieno, riprova più tardi\n", 32, 0);
+            close(client_fd);
+            continue;
+        }
+        pthread_mutex_unlock(&thread_count_mutex);
+        
+        // 4. PREPARA DATI PER THREAD
+        ThreadData* data = malloc(sizeof(ThreadData));
+        data->client_fd = client_fd;
+        data->client_addr = client_addr;
+        data->thread_id = ++thread_counter;
+        
+        // 5. CREA THREAD
+        if (pthread_create(&thread, NULL, gestisci_client_thread, data) != 0) {
+            perror("pthread_create failed");
+            free(data);
+            close(client_fd);
+        } else {
+            // Thread detached (si pulisce automaticamente)
+            pthread_detach(thread);
+        }
+    }
+    
+    close(server_fd);
+    pthread_mutex_destroy(&thread_count_mutex);
+    return 0;
+}
+```
+
+---
+
+## 🎯 Server TCP con Select (I/O Multiplexing)
 
 ### **Cos'è Select?**
 - **I/O Multiplexing**: gestisce multiple connessioni con un solo thread
@@ -604,60 +1040,99 @@ void chiudi_tutti_client(int client_sockets[], int max_clients) {
 
 ---
 
-## 📋 Checklist Server TCP con Select
+## 📋 Checklist Server TCP
 
-### ✅ **Setup Iniziale**
-- [ ] Include header necessari
-- [ ] Definisci costanti (PORT, MAX_CLIENTS, BUFFER_SIZE)
-- [ ] Crea array per gestire client
-- [ ] Inizializza socket server
+### ✅ **Server Sequenziale**
+- [ ] Un solo client alla volta
+- [ ] Loop: `accept() → recv/send loop → close()`
+- [ ] Semplice ma non scalabile
 
-### ✅ **Configurazione Select**
+### ✅ **Server con Fork**
+- [ ] `fork()` dopo ogni `accept()`
+- [ ] Processo figlio gestisce client
+- [ ] Padre continua ad accettare
+- [ ] Gestore `SIGCHLD` per zombie
+
+### ✅ **Server con Thread**
+- [ ] `pthread_create()` dopo ogni `accept()`
+- [ ] Thread gestisce client
+- [ ] Sincronizzazione per dati condivisi
+- [ ] `pthread_detach()` per cleanup automatico
+
+### ✅ **Server con Select**
 - [ ] `FD_ZERO(&master_fds)` - pulisce set
 - [ ] `FD_SET(server_fd, &master_fds)` - aggiunge server
-- [ ] Imposta `max_fd = server_fd`
-
-### ✅ **Main Loop**
-- [ ] Copia master_fds in read_fds
-- [ ] Chiama `select(max_fd + 1, &read_fds, NULL, NULL, NULL)`
-- [ ] Controlla server socket con `FD_ISSET(server_fd, &read_fds)`
-- [ ] Cicla su tutti i client con `FD_ISSET(client_fd, &read_fds)`
-
-### ✅ **Gestione Nuovi Client**
-- [ ] `accept()` nuova connessione
-- [ ] Trova slot libero nell'array
-- [ ] `FD_SET(new_client, &master_fds)`
-- [ ] Aggiorna `max_fd` se necessario
-
-### ✅ **Gestione Client Esistenti**
-- [ ] `recv()` dati dal client
-- [ ] Se `bytes_read <= 0` → client disconnesso
-- [ ] `close()` e `FD_CLR()` per rimuovere
-- [ ] Elabora dati ricevuti
+- [ ] Loop: `select() → controlla server → controlla client`
+- [ ] Gestione dinamica di `max_fd`
 
 ---
 
-## 🎯 Compilazione e Test
+## 🎯 Confronto Prestazioni
+
+| **Metrica** | **Sequenziale** | **Fork** | **Thread** | **Select** |
+|-------------|-----------------|----------|------------|------------|
+| **Concorrenza** | ❌ 1 | ✅ Alta | ✅ Alta | ✅ Altissima |
+| **Memoria** | ✅ Minima | ❌ Alta | ⚠️ Media | ✅ Minima |
+| **CPU** | ✅ Bassa | ❌ Alta | ⚠️ Media | ✅ Bassa |
+| **Scalabilità** | ❌ Pessima | ⚠️ Limitata | ✅ Buona | ✅ Ottima |
+| **Complessità** | ✅ Semplice | ⚠️ Media | ⚠️ Media | ❌ Alta |
+| **Debugging** | ✅ Facile | ❌ Difficile | ❌ Difficile | ⚠️ Medio |
+
+---
+
+## 🚀 Compilazione e Test
 
 ```bash
-# Compila server
+# Compila server sequenziale
+gcc -o server_seq server_sequenziale.c
+
+# Compila server con fork
+gcc -o server_fork server_fork.c
+
+# Compila server con thread
+gcc -o server_thread server_thread.c -lpthread
+
+# Compila server con select
 gcc -o server_select server_select.c
 
 # Test con netcat
 nc localhost 8080
 
-# Test multipli client
+# Test multipli client (solo per fork/thread/select)
 nc localhost 8080 &
 nc localhost 8080 &
 nc localhost 8080 &
 ```
 
-## 🚀 Vantaggi Select vs Thread
+---
 
-| **Select** | **Thread** |
-|------------|------------|
-| ✅ Single thread | ❌ Multiple thread |
-| ✅ Basso overhead | ❌ Alto overhead |
-| ✅ No race conditions | ❌ Sincronizzazione complessa |
-| ✅ Scalabile | ❌ Limitato da thread |
-| ❌ Più complesso | ✅ Più intuitivo |
+## 🎯 Quale Scegliere?
+
+### **Server Sequenziale** 
+👍 **Quando**: Prototipo, test, applicazioni molto semplici  
+👎 **Evita**: Applicazioni con multiple connessioni
+
+### **Server Fork**
+👍 **Quando**: Robustezza critica, client di lunga durata  
+👎 **Evita**: Molti client, risorse limitate
+
+### **Server Thread**  
+👍 **Quando**: Buon compromesso, condivisione dati tra client  
+👎 **Evita**: Quando la sincronizzazione diventa complessa
+
+### **Server Select**
+👍 **Quando**: Massime prestazioni, moltissimi client  
+👎 **Evita**: Logica molto semplice, team poco esperto
+
+---
+
+## 🏆 Best Practices
+
+1. **Sempre** usa `SO_REUSEADDR` per riavvii rapidi
+2. **Gestisci** sempre gli errori di sistema
+3. **Valida** input dei client prima di elaborarli  
+4. **Implementa** timeout per connessioni inattive
+5. **Usa** buffer appropriati per il tuo protocollo
+6. **Testa** con tool come `netcat`, `telnet`, `siege`
+7. **Monitora** risorse (memoria, file descriptor, CPU)
+8. **Implementa** logging per debugging e monitoring

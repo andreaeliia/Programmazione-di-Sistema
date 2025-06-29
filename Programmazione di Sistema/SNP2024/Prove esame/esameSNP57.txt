@@ -1,0 +1,61 @@
+[Attenzione: questo è un testo codificato in UTF-8]
+
+Creare nella propria home su hplinux3.unisalento.it una directory
+denominata proprioaccount.esameSNP57 (es.franco.esameSNP57) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria home
+su hplinux3.unisalento.it.
+
+I programmi creati devono essere eseguibili sia su macOS che su Linux.
+Nella directory si DEVE anche creare un file di nome "leggimi.txt" che
+descriva l'impostazione adottata per le soluzioni oltre ad eventuali
+commenti e/o osservazioni. Si fa presente che il contenuto di tale file
+permette spesso una migliore comprensione della logica seguita nello
+svolgimento e, di conseguenza, la sua presenza va a tutto vantaggio
+dell'esaminando.
+
+Aggiungere all'inizio di qualsiasi file creato una riga di commento
+contenente il proprio cognome, nome e numero di matricola.
+
+Alla fine, copiare, incollare ed eseguire, in un terminale con il quale
+si sia acceduto al proprio account Linux, la seguente linea di comando:
+
+cd; tar cvfz $USER.esameSNP57.tgz $USER.esameSNP57
+
+[ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP57 è
+stata trasferita sulla propria home su hplinux3.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è lavorato).]
+
+Esercizio
+
+Scrivere client e server che implementino il seguente sistema.
+
+Un docente vuole effettuare in tempo reale un monitoraggio
+della ricezione della lezione che sta svolgendo da parte della classe.
+
+A tal proposito mette a disposizione degli studenti un client che invia
+in forma anonima e in tempo reale con messaggi a un indirizzo multicast
+passato come argomento al client.
+
+I messaggi sono inviati tramite la pressione di un singolo tasto
+(ovvero senza un seguente invio) effettuata da ognuno dagli studenti in 
+qualsiasi momento ritengano opportuno. 
+
+In particolare i tasti premuti avranno il seguente significato:
+
+A = Applauso
+R = Ripetere
+I = Incomprensibile
+N = Troppo noioso
+C = Continuare così
+B = Interrompere, inutile continuare
+
+Il server che gira sulla macchina del docente acquisisce l'indirizzo 
+multicast come argomento. 
+Esso riceve e mostra in tempo reale, per ciascuna categoria, il totale 
+dall’inizio della lezione dei messaggi ricevuti  e il totale dei messaggi 
+per gli ultimi 5 minuti e per l’ultimo minuto.
+
+

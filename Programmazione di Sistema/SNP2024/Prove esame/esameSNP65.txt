@@ -1,0 +1,53 @@
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux3.unisalento.it una directory
+denominata proprioaccount.esameSNP65 (es.franco.esameSNP65) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria
+home su hplinux3.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di
+makefile. Anche nel caso in cui non sia possibile risolvere il
+problema in accordo con lo standard, la soluzione deve comunque
+funzionare su Linux e macOS. Nella directory si DEVE anche creare un
+file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le
+soluzioni oltre ad eventuali commenti e/o osservazioni. Si fa presente
+che il contenuto di tale file permette spesso una migliore
+comprensione della logica seguita nello svolgimento e, di conseguenza,
+la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP65.tgz $USER.esameSNP65
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP65 è
+stata trasferita sulla propria home su hplinux3.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la
+consegna del compito, di fare riferimento alla pagina web: 
+http://www.liis.it/mw/index.php/LiiS:Istruzioni ]
+
+Esercizio
+
+Si vuol predisporre uno strumento per verificare se, usando delle
+thread, un processo si avvantaggia della presenza di più core nella CPU
+di una macchina oppure se tale uso è ininfluente sui risultati.
+
+L’esperimento potrebbe essere così concepito:
+
+1) In un processo una thread deidcata alla misura effettua dopo un
+congruo intervallo di tempo prefissato la misura di quante
+moltiplicazioni tra due interi casuali sono state effettuate depositando
+il risultato in un’area di memoria appartenente al processo.
+
+2) Nel primo caso una thread singola effettua le moltiplicazioni e
+registra il risultato nell'area di memoria.
+
+3) Nel secondo caso 3 thread svolgono ciascuna indipendentemente
+dall’altra la stessa operazione. 
+
+Effettuando le misure del numero di risultati nei due casi, la thread di
+misura potrà stabilire se e quanto il calcolo a 3 thread ha prodotto più
+risultati del calcolo a thread singola.

@@ -1,0 +1,75 @@
+Testo in italiano
+
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux2.unisalento.it una directory denominata
+proprioaccount.esameSNP22 (es.franco.esameSNP22) e svolgere l'esercizio in tale directory
+o, in alternativa, creare una directory con lo stesso nome nella propria home macOS,
+svolgere gli esercizi in tale directory e, alla fine della prova, trasferirla nella
+propria home su hplinux2.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di makefile. Anche nel
+caso in cui non sia possibile risolvere il problema in accordo con lo standard, la
+soluzione deve comunque funzionare su Linux e macOS. Nella directory si DEVE anche creare
+un file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le soluzioni oltre
+ad eventuali commenti e/o osservazioni. Si fa presente che il contenuto di tale file
+permette spesso una migliore comprensione della logica seguita nello svolgimento e, di
+conseguenza, la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP22.tgz $USER.esameSNP22
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito sulla macchina Linux,
+DOPO che la cartella proprioaccount.esameSNP22 è stata trasferita sulla propria home su
+hplinux2.unisalento.it e NON mentre è ancora nella propria home su macOS (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la consegna del
+compito, di fare riferimento alla pagina web: 
+http://www.liis.it/mw/index.php/LiiS:Istruzioni ]
+
+
+Esercizio
+
+Realizzare un client TCP che apra una connessione alla porta SMTP di un qualunque server
+pubblico che la accetti e misuri il tempo tra l'apertura della connessione e il
+ricevimento della risposta dal server. Il client deve fare ciò periodicamente,  chiudendo
+ogni volta la connessione con il comando SMTP QUIT e registrando in file di log tutte le
+misure fatte. Il server da contattare e l'intervallo tra le misure devono essere passati
+come argomento al processo. Allo stesso tempo, una thread del client deve essere
+predisposta in modo da ricevere tutti i segnali rivolti al processo evitando, tutte le
+volte che ciò è possibile, che questi causino interruzioni del processo e registrare il
+nome del segnale e l'istante dell'arrivo in un file di log.
+
+_____________________________________________________________________________ 
+English text
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP22 in your home on
+hplinux2.unisalento.it (e.g. franco.esameSNP22) and solve the exercise in that directory
+or, alternatively, create a directory with the same name in your macOS home, and solve the
+exercise in that directory. Eventually, transfer it to your home on
+hplinux2.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be provided. If the
+solution and the compliance are not possible together, the solution must anyway be working
+both on Linux and macOS. In the same directory, a file named README.txt containing a
+description of the solution and, possibly, comments/observations on the choices made to
+solve the problem, MUST be placed. Keep in mind that the file may help the reader to
+understand the logic you adopted and to better appreciate your work.
+
+When finished, execute in your own Linux account the following command line:
+
+cd; tar cvfz $USER.esameSNP22.tgz $USER.esameSNP22
+
+[BEWARE: the command above shown must be issued in the shell running in the Linux machine,
+AFTER the folder youraccount.esameSNP22 has been transferred to your home on
+hplinux2.unisalento.it and NOT when it's still in your home on macOS (if you wrote the
+program there). For any doubt about the way to carry on the exercise and how to hand it
+in, please read the web page (still in italian, sorry, soon to be translated in english):
+http://www.liis.it/mw/index.php/LiiS:Istruzioni]
+
+Exercise
+
+Write a client software which is able to periodically open a TCP connection to the SMTP port of an open public server and close it with a QUIT command. The client must be able to measure the time between the opening and the closing of the connections and to write the measure results in a log file. The server name and the period of the measures must be passed as arguments to the executable.
+The client must include a thread which is set-up to intercept all the signals aimed at the process, avoiding whenever possible the termination of the same, and to record both the name of the caught signals and the time of their arrival in a log file.

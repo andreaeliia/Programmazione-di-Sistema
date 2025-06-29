@@ -1,0 +1,41 @@
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP54 in your home on
+hplinux3.unisalento.it (e.g. franco.esameSNP54) and solve the exercise in that
+directory or, alternatively, create a directory with the same name in your
+macOS home, and solve the exercise in that directory. Eventually, transfer it
+to your home on hplinux3.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be provided.
+If the solution and the compliance are not possible together, the solution
+must anyway be working both on Linux and macOS. In the same directory, a file
+named README.txt containing a description of the solution and, possibly,
+comments/observations on the choices made to solve the problem, MUST be
+placed. Keep in mind that the file may help the reader to understand the logic
+you adopted and to better appreciate your work.
+
+When finished, execute in your own Linux account the following command line:
+
+cd; tar cvfz $USER.esameSNP54.tgz $USER.esameSNP54
+
+[BEWARE: the command above shown must be issued in the shell running in the
+Linux machine, AFTER the folder youraccount.esameSNP54 has been transferred to
+your home on hplinux3.unisalento.it and NOT when it's still in your home on
+macOS (if you wrote the program there). ]
+
+Exercise
+
+A process P1 acts as a UDP server. When it receives a text message from
+any client it writes the IP address of the client and the received text
+message in two lines of a POSIX shared memory. Another process P2 must read
+each of the two lines from the shared memory and append them to a file. 
+P1 and P2 must manage concurrency through a record locking mechanism.
+
+
+
+
+
+
+
+

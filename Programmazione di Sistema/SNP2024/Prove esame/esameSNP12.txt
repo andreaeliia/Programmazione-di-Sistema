@@ -1,0 +1,47 @@
+[Attenzione: questo è un testo codificato in UTF-8] Creare nella propria
+home su hplinux2.unisalento.it una directory denominata
+proprioaccount.esameSNP12 (es.franco.esameSNP12) e svolgere l'esercizio
+in tale directory o, in alternativa, creare una directory con lo stesso
+nome nella propria home Mac OS X, svolgere gli esercizi in tale
+directory e, alla fine della prova, trasferirla nella propria home su
+hplinux2.unisalento.it.
+
+I programmi creati devono essere compilabili ed eseguibili sia su Mac OS
+X che su Linux. Nella directory si DEVE anche creare un file di nome
+"leggimi.txt" che descriva l'impostazione adottata per le soluzioni
+oltre ad eventuali commenti e/o osservazioni. Si fa presente che il
+contenuto di tale file permette spesso una migliore comprensione della
+logica seguita nello svolgimento e, di conseguenza, la sua presenza va a
+tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP12.tgz $USER.esameSNP12
+
+[ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP12 è
+stata trasferita sulla propria home su hplinux2.unisalento.it e NON
+mentre è ancora nella propria home su Mac OS X (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la
+consegna del compito, di fare riferimento alla pagina web:
+http://www.liis.it/mw/index.php/LiiS:Istruzioni]
+
+Esercizio
+
+In un sistema client-server, i client possono assumere una qualunque posizione in 
+una matrice 100x100 e permettere ai loro utenti di modificarla tramite i tasti "u" (alto), 
+"n" (basso), "h" (sinistra), "j" (destra).
+Il server riceve in tempo reale informazioni sulla posizione di tutti i client e 
+restituisce in tempo reale a ciascun client aggiornamenti sulla posizione di tutti 
+gli altri.
+Il server gestisce ciascun client con una thread ad esso dedicata.
+I client sono in grado di presentare graficamente ai loro utenti l'intera mappa.
+
+
+
+
+
+
+
+
+

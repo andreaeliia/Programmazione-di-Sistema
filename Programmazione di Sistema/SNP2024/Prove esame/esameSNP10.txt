@@ -1,0 +1,46 @@
+[Attenzione: questo è un testo codificato in UTF-8] Creare nella propria
+home su hplinux2.unisalento.it una directory denominata
+proprioaccount.esameSNP10 (es.franco.esameSNP10) e svolgere l'esercizio
+in tale directory o, in alternativa, creare una directory con lo stesso
+nome nella propria home Mac OS X, svolgere gli esercizi in tale
+directory e, alla fine della prova, trasferirla nella propria home su
+hplinux2.unisalento.it.
+
+I programmi creati devono essere compilabili ed eseguibili sia su Mac OS
+X che su Linux. Nella directory si DEVE anche creare un file di nome
+"leggimi.txt" che descriva l'impostazione adottata per le soluzioni
+oltre ad eventuali commenti e/o osservazioni. Si fa presente che il
+contenuto di tale file permette spesso una migliore comprensione della
+logica seguita nello svolgimento e, di conseguenza, la sua presenza va a
+tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP10.tgz $USER.esameSNP10
+
+[ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP10 è
+stata trasferita sulla propria home su hplinux2.unisalento.it e NON
+mentre è ancora nella propria home su Mac OS X (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la
+consegna del compito, di fare riferimento alla pagina web:
+http://www.liis.it/mw/index.php/LiiS:Istruzioni]
+
+Esercizio
+
+Si permetta a due processi di gestire, congiuntamente in un'area di memoria condivisa,
+la stessa lista concatenata (linked list) di elementi descritti da una struttura dati,   
+(con le funzioni pop, insert, count). Per la condivisione della memoria e per la gestione
+della concorrenza, si usi la POSIX IPC. Si fornisca a entrambi i processi un'interfaccia
+utente testuale per ricevere dall'utente i comandi.
+
+
+
+
+
+
+
+
+
+
+

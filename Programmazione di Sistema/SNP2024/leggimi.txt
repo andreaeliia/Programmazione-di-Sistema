@@ -1,0 +1,20 @@
+All'interno del main, utilizzando la funzione srand e passando come argomento il timestamp del tempo corrente,
+vengono generati 1000 numeri casuali, inseriti poi all'interno dell'array numbers.
+A questo punto inizia la comunicazione tra processi richiamando la funzione unnamed_pipe().
+Nella funzione unnamed_pipe() per sincronizzare la comunicazione tra i due processi si ricorre ad un semaforo.
+Per identificare il semaforo nel file kernel è necessario un identificatore intero non negativo e per questo
+si utilizza la funzione di sistema ftok() per generare una chiave univoca. Dopo aver generato la chiave,
+viene utilizzata la funzione semget() per ottenere l'ID del set di semafori, specificando il flag IPC_CREAT
+per creare l'array. A questo punto viene inizializzato il semaforo con la funzione semctl().
+Dopo la creazione del semaforo si procede con la creazione del secondo processo, il processo child, dopo aver verificato la corretta
+creazione della pipe con la funzione pipe() che restituisce due descrittori di file file_pipes[0] aperto in lettura e 
+file_pipes[1] aperto in scrittura.
+In questo caso stiamo trattando una pipe che va dal parent al child, quindi nel caso del processo figlio viene
+chiuso il descrittore di file file_pipe[1] per la scrittura, mentre nel caso del parent viene chiuso il
+file_pipes[0] per la lettura.
+In entrambi i processi vengono utilizzati i semafori per sincronizzare lettura e scrittura all'interno della pipe,
+in particolare, come già detto prima, il parent si interessa della scrittura (con la funzione write()) mentre il 
+child della lettura (con la funzione read).
+Il tempo di orologio viene calcolato utilizzando la funzione gettimeofday() che, utilizzando una struttura timeval,
+permette di ottenere il tempo con una precisione in microsecondi. I tempi di utente e di sistema sono ottenuti
+utilizzando la funzione times che sfrutta il concetto di ticks e poi convertendo in microsecondi.

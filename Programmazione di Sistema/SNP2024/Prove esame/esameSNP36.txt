@@ -1,0 +1,60 @@
+Testo in italiano
+
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux2.unisalento.it una directory
+denominata proprioaccount.esameSNP36 (es.franco.esameSNP36) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria
+home su hplinux2.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di
+makefile. Anche nel caso in cui non sia possibile risolvere il
+problema in accordo con lo standard, la soluzione deve comunque
+funzionare su Linux e macOS. Nella directory si DEVE anche creare un
+file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le
+soluzioni oltre ad eventuali commenti e/o osservazioni. Si fa presente
+che il contenuto di tale file permette spesso una migliore
+comprensione della logica seguita nello svolgimento e, di conseguenza,
+la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP36.tgz $USER.esameSNP36
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP36 è
+stata trasferita sulla propria home su hplinux2.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la
+consegna del compito, di fare riferimento alla pagina web: 
+http://www.liis.it/mw/index.php/LiiS:Istruzioni ]
+
+Esercizio
+
+Scrivere nel linguaggio C un programma client di nome A e un programma 
+server di nome B che funzionino nel modo seguente:
+
+1) Il programma A chiede all'utente se vuole contare file o directory.
+
+2) L'utente risponde con una lettera ("f" per file e "d" per directory).
+
+3) Il programma A invia con un datagramma UDP tale lettera al programma
+B.
+
+4) Il programma B conta tutti i file o tutte le directory della macchina
+su cui gira, a seconda della lettera ricevuta e invia la risposta al
+programma A che la mostra all'utente.
+
+Per provare la coppia di programmi posizionare B su
+hplinux2.unisalento.it e A sul computer sul quale si sta svolgendo la
+prova. 
+
+______________________________________________________________________
+English text
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+To be provided soon
+

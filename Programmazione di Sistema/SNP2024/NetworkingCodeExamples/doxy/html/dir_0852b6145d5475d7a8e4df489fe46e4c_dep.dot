@@ -1,0 +1,10 @@
+digraph "doxy" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_0852b6145d5475d7a8e4df489fe46e4c {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_0852b6145d5475d7a8e4df489fe46e4c.html"];
+    dir_0852b6145d5475d7a8e4df489fe46e4c [shape=plaintext label="doxy"];
+    dir_642fd44dd3fea087fc182af705d746d9 [shape=box label="html" color="red" fillcolor="white" style="filled" URL="dir_642fd44dd3fea087fc182af705d746d9.html"];
+  }
+}

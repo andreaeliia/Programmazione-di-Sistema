@@ -1,0 +1,43 @@
+[BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP50 in your home on
+hplinux2.unisalento.it (e.g. franco.esameSNP50) and solve the exercise
+in that directory or, alternatively, create a directory with the same
+name in your macOS home, and solve the exercise in that directory.
+Eventually, transfer it to your home on hplinux2.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be
+provided. If the solution and the compliance are not possible together,
+the solution must anyway be working both on Linux and macOS. In the same
+directory, a file named README.txt containing a description of the
+solution and, possibly, comments/observations on the choices made to
+solve the problem, MUST be placed. Keep in mind that the file may help
+the reader to understand the logic you adopted and to better appreciate
+your work.
+
+When finished, issue in your own Linux account the following command
+line:
+
+cd; tar cvfz $USER.esameSNP50.tgz $USER.esameSNP50
+
+[ BEWARE: the command above shown must be issued in the shell running in
+the Linux machine, AFTER the folder youraccount.esameSNP50 has been
+transferred to your home on hplinux2.unisalento.it and NOT when it's
+still in your home on macOS (in the case you wrote the program there).
+
+Exercise
+
+Let T1 and T2 be two threads of a process P1 on a machine A and P2 and
+P3 be two processes on machine B. Let the following events happen in the
+order so defined:
+
+1) T1 generates a random string and sends it to P2, 2) then P2 shares
+the string with P3 through a shared memory 3) then P3 sends the string
+to T2 4) return to step 1 as soon as T2 has received back the string.
+
+Make sure each step is performed only when the previous one is
+completed. Have P1 print to the standard output the time with nanosecond
+precision on the completion of each loop.
+
+To speed up development the three processes may run on the same machine
+and P1 may communicate with P2 and P3 through the loopback address.

@@ -1,0 +1,51 @@
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP53 in your home on
+hplinux3.unisalento.it (e.g. franco.esameSNP53) and solve the exercise in that
+directory or, alternatively, create a directory with the same name in your
+macOS home, and solve the exercise in that directory. Eventually, transfer it
+to your home on hplinux3.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be provided.
+If the solution and the compliance are not possible together, the solution
+must anyway be working both on Linux and macOS. In the same directory, a file
+named README.txt containing a description of the solution and, possibly,
+comments/observations on the choices made to solve the problem, MUST be
+placed. Keep in mind that the file may help the reader to understand the logic
+you adopted and to better appreciate your work.
+
+When finished, execute in your own Linux account the following command line:
+
+cd; tar cvfz $USER.esameSNP53.tgz $USER.esameSNP53
+
+[BEWARE: the command above shown must be issued in the shell running in the
+Linux machine, AFTER the folder youraccount.esameSNP53 has been transferred to
+your home on hplinux3.unisalento.it and NOT when it's still in your home on
+macOS (if you wrote the program there). ]
+
+Exercise
+
+Write a client C and a server S working together as follows:
+
+When C sends the string "JPEG" to S, S starts a recursive search, within
+the home directory of the user who launched it, looking for files of type
+JPEG (that is, files starting with the "magic number" FFD8) and sends
+back their path to the client C.
+
+When C sends the string "PNG" to S, S starts a recursive search within
+the home directory of the user who launched it looking for files of type
+PNG (that is, files starting with the "magic number" 89504E470D0A1A0A)
+and sends back their path to the client C.
+
+Both the client and the server must perform their duties WITHOUT using
+the system() system call.
+
+
+
+
+
+
+
+
+

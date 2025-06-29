@@ -1,0 +1,58 @@
+Testo in italiano
+
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux2.unisalento.it una directory
+denominata proprioaccount.esameSNP35 (es.franco.esameSNP35) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria
+home su hplinux2.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di
+makefile. Anche nel caso in cui non sia possibile risolvere il
+problema in accordo con lo standard, la soluzione deve comunque
+funzionare su Linux e macOS. Nella directory si DEVE anche creare un
+file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le
+soluzioni oltre ad eventuali commenti e/o osservazioni. Si fa presente
+che il contenuto di tale file permette spesso una migliore
+comprensione della logica seguita nello svolgimento e, di conseguenza,
+la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP35.tgz $USER.esameSNP35
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP35 è
+stata trasferita sulla propria home su hplinux2.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la
+consegna del compito, di fare riferimento alla pagina web: 
+http://www.liis.it/mw/index.php/LiiS:Istruzioni ]
+
+Esercizio
+
+Ognuna delle tre thread di un processo A intende trasferire ad un
+processo B il contenuto di un proprio file della dimensione 100 KB,
+utilizzando un’area di memoria, della dimensione di 20 byte, condivisa
+con tale processo. Per farsi riconoscere dal processo B ogni thread fa
+precedere la sequenza di byte posta nell’area da una propria sigla
+caratteristica di 2 byte.
+
+Ciascuna thread del processo A può sovrascrivere l'area di memoria ogni
+volta che riesce ad estrarre da una pipe un byte di valore prestabilito
+che il processo B vi inserisce tutte le volte che ha effettuato con
+successo la lettura di una nuova sequenza.
+
+Scrivere tutto il software necessario ad implementare il meccanismo
+sopra descritto facendo attenzione alla gestione della concorrenza tra
+le thread e all'equa ripartizione tra le tre dell'accesso alla
+scrittura.
+______________________________________________________________________
+English text
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+To be provided soon
+

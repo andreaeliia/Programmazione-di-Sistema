@@ -1,6 +1,6 @@
 # File I/O e Directory Management - Riferimento Completo
 
-## 🎯 Concetti Fondamentali
+## Concetti Fondamentali
 
 ### **File Descriptor**
 - **Numero intero**: identifica file aperti nel processo
@@ -23,7 +23,7 @@
 
 ---
 
-## 📁 File I/O Base - System Calls
+## File I/O Base - System Calls
 
 ```c
 #include <stdio.h>
@@ -47,7 +47,7 @@ void basic_file_io_example() {
     ssize_t bytes_written, bytes_read;
     
     // 1. CREAZIONE E SCRITTURA FILE
-    printf("📝 Creazione e scrittura file '%s'\n", filename);
+    printf("Creazione e scrittura file '%s'\n", filename);
     
     fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
     if (fd == -1) {
@@ -62,11 +62,11 @@ void basic_file_io_example() {
         return;
     }
     
-    printf("✅ Scritti %zd bytes nel file\n", bytes_written);
+    printf("Scritti %zd bytes nel file\n", bytes_written);
     close(fd);
     
     // 2. LETTURA FILE
-    printf("\n📖 Lettura file '%s'\n", filename);
+    printf("\nLettura file '%s'\n", filename);
     
     fd = open(filename, O_RDONLY);
     if (fd == -1) {
@@ -82,11 +82,11 @@ void basic_file_io_example() {
     }
     
     read_buffer[bytes_read] = '\0';
-    printf("✅ Letti %zd bytes:\n%s\n", bytes_read, read_buffer);
+    printf("Letti %zd bytes:\n%s\n", bytes_read, read_buffer);
     close(fd);
     
     // 3. APPEND AL FILE
-    printf("📝 Append al file\n");
+    printf("Append al file\n");
     
     fd = open(filename, O_WRONLY | O_APPEND);
     if (fd == -1) {
@@ -97,11 +97,11 @@ void basic_file_io_example() {
     const char* append_data = "Riga aggiunta con append\n";
     bytes_written = write(fd, append_data, strlen(append_data));
     
-    printf("✅ Aggiunti %zd bytes al file\n", bytes_written);
+    printf("Aggiunti %zd bytes al file\n", bytes_written);
     close(fd);
     
     // 4. LETTURA FINALE
-    printf("\n📖 Contenuto finale:\n");
+    printf("\nContenuto finale:\n");
     
     fd = open(filename, O_RDONLY);
     if (fd != -1) {
@@ -114,189 +114,7 @@ void basic_file_io_example() {
     
     // Cleanup
     unlink(filename);
-    printf("\n🗑️  File rimosso\n");
-}
-
-// Gestione avanzata file descriptor
-void advanced_file_descriptor_example() {
-    printf("\n=== GESTIONE AVANZATA FILE DESCRIPTOR ===\n");
-    
-    const char* filename = "advanced_test.txt";
-    int fd1, fd2, fd3;
-    char buffer[64];
-    off_t position;
-    
-    // Crea file di test
-    fd1 = open(filename, O_CREAT | O_RDWR | O_TRUNC, 0644);
-    if (fd1 == -1) {
-        perror("open create");
-        return;
-    }
-    
-    // Scrivi dati di test
-    write(fd1, "0123456789ABCDEFGHIJ", 20);
-    
-    printf("📄 File creato con 20 bytes: '0123456789ABCDEFGHIJ'\n");
-    
-    // 1. DUPLICAZIONE FILE DESCRIPTOR
-    printf("\n🔄 Duplicazione file descriptor\n");
-    
-    fd2 = dup(fd1);        // Duplica FD
-    fd3 = dup2(fd1, 10);   // Duplica su FD specifico (10)
-    
-    printf("FD originale: %d\n", fd1);
-    printf("FD duplicato (dup): %d\n", fd2);
-    printf("FD duplicato (dup2): %d\n", fd3);
-    
-    // Tutti i FD puntano allo stesso file!
-    
-    // 2. SEEK - POSIZIONAMENTO NEL FILE
-    printf("\n🎯 Posizionamento nel file (lseek)\n");
-    
-    // Posiziona all'inizio
-    position = lseek(fd1, 0, SEEK_SET);
-    printf("Posizione dopo SEEK_SET(0): %ld\n", position);
-    
-    read(fd1, buffer, 5);
-    buffer[5] = '\0';
-    printf("Letti 5 bytes: '%s'\n", buffer);
-    
-    // Posizione corrente
-    position = lseek(fd1, 0, SEEK_CUR);
-    printf("Posizione corrente: %ld\n", position);
-    
-    // Vai alla fine
-    position = lseek(fd1, 0, SEEK_END);
-    printf("Posizione fine file: %ld\n", position);
-    
-    // Posiziona 5 bytes dall'inizio
-    lseek(fd1, 5, SEEK_SET);
-    read(fd1, buffer, 5);
-    buffer[5] = '\0';
-    printf("5 bytes da posizione 5: '%s'\n", buffer);
-    
-    // 3. FCNTL - CONTROLLO FILE DESCRIPTOR
-    printf("\n⚙️  Controllo file descriptor (fcntl)\n");
-    
-    // Ottieni flag attuali
-    int flags = fcntl(fd1, F_GETFL);
-    if (flags != -1) {
-        printf("Flag file: ");
-        if (flags & O_RDONLY) printf("O_RDONLY ");
-        if (flags & O_WRONLY) printf("O_WRONLY ");
-        if (flags & O_RDWR) printf("O_RDWR ");
-        if (flags & O_APPEND) printf("O_APPEND ");
-        printf("\n");
-    }
-    
-    // Imposta flag non-bloccante
-    fcntl(fd1, F_SETFL, flags | O_NONBLOCK);
-    printf("Flag O_NONBLOCK impostato\n");
-    
-    // 4. FILE LOCKING
-    printf("\n🔒 File locking\n");
-    
-    struct flock lock;
-    lock.l_type = F_WRLCK;      // Write lock
-    lock.l_whence = SEEK_SET;
-    lock.l_start = 0;
-    lock.l_len = 0;             // Lock intero file
-    
-    if (fcntl(fd1, F_SETLK, &lock) == 0) {
-        printf("✅ File locked per scrittura\n");
-        
-        // Prova a fare lock con altro FD (dovrebbe fallire)
-        if (fcntl(fd2, F_SETLK, &lock) == -1) {
-            printf("❌ Lock fallito su FD duplicato (corretto!)\n");
-        }
-        
-        // Unlock
-        lock.l_type = F_UNLCK;
-        fcntl(fd1, F_SETLK, &lock);
-        printf("🔓 File unlocked\n");
-        
-    } else {
-        printf("❌ Errore file lock: %s\n", strerror(errno));
-    }
-    
-    // Cleanup
-    close(fd1);
-    close(fd2);
-    close(fd3);
-    unlink(filename);
-    
-    printf("🗑️  File e FD puliti\n");
-}
-
-// Statistiche file
-void file_statistics_example() {
-    printf("\n=== STATISTICHE FILE ===\n");
-    
-    const char* filename = "stats_test.txt";
-    struct stat file_stats;
-    int fd;
-    
-    // Crea file di test
-    fd = open(filename, O_CREAT | O_WRONLY, 0755);
-    if (fd == -1) {
-        perror("open");
-        return;
-    }
-    
-    write(fd, "File di test per statistiche\n", 29);
-    close(fd);
-    
-    // Ottieni statistiche con stat()
-    if (stat(filename, &file_stats) == 0) {
-        printf("📊 Statistiche file '%s':\n", filename);
-        printf("   📏 Dimensione: %ld bytes\n", file_stats.st_size);
-        printf("   🔗 Hard links: %ld\n", file_stats.st_nlink);
-        printf("   🆔 Inode: %ld\n", file_stats.st_ino);
-        printf("   👤 UID: %d\n", file_stats.st_uid);
-        printf("   👥 GID: %d\n", file_stats.st_gid);
-        
-        // Permessi
-        printf("   🔐 Permessi: ");
-        printf((S_ISDIR(file_stats.st_mode)) ? "d" : "-");
-        printf((file_stats.st_mode & S_IRUSR) ? "r" : "-");
-        printf((file_stats.st_mode & S_IWUSR) ? "w" : "-");
-        printf((file_stats.st_mode & S_IXUSR) ? "x" : "-");
-        printf((file_stats.st_mode & S_IRGRP) ? "r" : "-");
-        printf((file_stats.st_mode & S_IWGRP) ? "w" : "-");
-        printf((file_stats.st_mode & S_IXGRP) ? "x" : "-");
-        printf((file_stats.st_mode & S_IROTH) ? "r" : "-");
-        printf((file_stats.st_mode & S_IWOTH) ? "w" : "-");
-        printf((file_stats.st_mode & S_IXOTH) ? "x" : "-");
-        printf(" (%o)\n", file_stats.st_mode & 0777);
-        
-        // Timestamp
-        printf("   📅 Creazione: %s", ctime(&file_stats.st_ctime));
-        printf("   📝 Modifica: %s", ctime(&file_stats.st_mtime));
-        printf("   👁️  Accesso: %s", ctime(&file_stats.st_atime));
-        
-        // Tipo file
-        printf("   📄 Tipo: ");
-        if (S_ISREG(file_stats.st_mode)) printf("File regolare\n");
-        else if (S_ISDIR(file_stats.st_mode)) printf("Directory\n");
-        else if (S_ISLNK(file_stats.st_mode)) printf("Symbolic link\n");
-        else if (S_ISBLK(file_stats.st_mode)) printf("Block device\n");
-        else if (S_ISCHR(file_stats.st_mode)) printf("Character device\n");
-        else if (S_ISFIFO(file_stats.st_mode)) printf("FIFO/pipe\n");
-        else if (S_ISSOCK(file_stats.st_mode)) printf("Socket\n");
-        else printf("Sconosciuto\n");
-        
-    } else {
-        perror("stat");
-    }
-    
-    // Test accesso file
-    printf("\n🔍 Test accesso file:\n");
-    printf("   Leggibile: %s\n", (access(filename, R_OK) == 0) ? "✅ Sì" : "❌ No");
-    printf("   Scrivibile: %s\n", (access(filename, W_OK) == 0) ? "✅ Sì" : "❌ No");
-    printf("   Eseguibile: %s\n", (access(filename, X_OK) == 0) ? "✅ Sì" : "❌ No");
-    printf("   Esiste: %s\n", (access(filename, F_OK) == 0) ? "✅ Sì" : "❌ No");
-    
-    unlink(filename);
+    printf("\nFile rimosso\n");
 }
 
 // Copia file efficiente
@@ -354,59 +172,11 @@ ssize_t copy_file(const char* source, const char* destination) {
     
     return total_copied;
 }
-
-void file_copy_example() {
-    printf("\n=== COPIA FILE ===\n");
-    
-    const char* source = "source.txt";
-    const char* destination = "destination.txt";
-    
-    // Crea file sorgente
-    int fd = open(source, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-    if (fd != -1) {
-        const char* content = "Questo è il contenuto del file sorgente.\n"
-                             "Seconda riga del file.\n"
-                             "Terza riga con più testo per test.\n";
-        write(fd, content, strlen(content));
-        close(fd);
-    }
-    
-    printf("📁 File sorgente '%s' creato\n", source);
-    
-    // Copia file
-    ssize_t copied = copy_file(source, destination);
-    
-    if (copied > 0) {
-        printf("✅ File copiato: %zd bytes da '%s' a '%s'\n", 
-               copied, source, destination);
-        
-        // Verifica copia
-        struct stat src_stats, dst_stats;
-        stat(source, &src_stats);
-        stat(destination, &dst_stats);
-        
-        printf("📊 Dimensioni: source=%ld, destination=%ld\n", 
-               src_stats.st_size, dst_stats.st_size);
-        
-        if (src_stats.st_size == dst_stats.st_size) {
-            printf("✅ Copia verificata correttamente\n");
-        } else {
-            printf("❌ Errore nella copia\n");
-        }
-        
-    } else {
-        printf("❌ Errore copia file\n");
-    }
-    
-    // Cleanup
-    unlink(source);
-    unlink(destination);
-}
 ```
 
 ---
 
-## 📂 Directory Management
+## Directory Management e Traversal Completo
 
 ```c
 #include <stdio.h>
@@ -418,22 +188,60 @@ void file_copy_example() {
 #include <errno.h>
 #include <time.h>
 
-// Lista contenuto directory
-void list_directory_contents(const char* directory_path) {
-    printf("=== CONTENUTO DIRECTORY '%s' ===\n", directory_path);
-    
-    DIR* dir = opendir(directory_path);
-    if (dir == NULL) {
-        perror("opendir");
-        return;
+// Struttura per raccogliere informazioni sui file
+typedef struct {
+    char **file_paths;
+    int file_count;
+    int capacity;
+    long total_size;
+} FileCollection;
+
+// Inizializza collezione file
+FileCollection* init_file_collection() {
+    FileCollection* fc = malloc(sizeof(FileCollection));
+    fc->file_paths = malloc(100 * sizeof(char*));
+    fc->file_count = 0;
+    fc->capacity = 100;
+    fc->total_size = 0;
+    return fc;
+}
+
+// Aggiungi file alla collezione
+void add_file_to_collection(FileCollection* fc, const char* filepath, long size) {
+    if (fc->file_count >= fc->capacity) {
+        fc->capacity *= 2;
+        fc->file_paths = realloc(fc->file_paths, fc->capacity * sizeof(char*));
     }
     
+    fc->file_paths[fc->file_count] = malloc(strlen(filepath) + 1);
+    strcpy(fc->file_paths[fc->file_count], filepath);
+    fc->file_count++;
+    fc->total_size += size;
+}
+
+// Libera collezione file
+void free_file_collection(FileCollection* fc) {
+    for (int i = 0; i < fc->file_count; i++) {
+        free(fc->file_paths[i]);
+    }
+    free(fc->file_paths);
+    free(fc);
+}
+
+// FUNZIONE PRINCIPALE: Raccoglie TUTTI i file da una directory ricorsivamente
+int collect_all_files_recursive(const char* directory_path, FileCollection* fc) {
+    DIR* dir;
     struct dirent* entry;
     struct stat entry_stats;
-    char full_path[512];
-    int file_count = 0, dir_count = 0;
+    char full_path[1024];
     
-    printf("📋 Lista contenuti:\n");
+    printf("Esplorando directory: %s\n", directory_path);
+    
+    dir = opendir(directory_path);
+    if (dir == NULL) {
+        printf("Errore apertura directory %s: %s\n", directory_path, strerror(errno));
+        return -1;
+    }
     
     while ((entry = readdir(dir)) != NULL) {
         // Salta . e ..
@@ -444,87 +252,226 @@ void list_directory_contents(const char* directory_path) {
         // Costruisci path completo
         snprintf(full_path, sizeof(full_path), "%s/%s", directory_path, entry->d_name);
         
-        // Ottieni statistiche
-        if (stat(full_path, &entry_stats) == 0) {
-            // Icona basata sul tipo
-            char type_icon = '?';
-            if (S_ISDIR(entry_stats.st_mode)) {
-                type_icon = '📁';
-                dir_count++;
-            } else if (S_ISREG(entry_stats.st_mode)) {
-                type_icon = '📄';
-                file_count++;
-            } else if (S_ISLNK(entry_stats.st_mode)) {
-                type_icon = '🔗';
-            }
+        // Ottieni informazioni sul file/directory
+        if (stat(full_path, &entry_stats) != 0) {
+            printf("Errore stat su %s: %s\n", full_path, strerror(errno));
+            continue;
+        }
+        
+        if (S_ISREG(entry_stats.st_mode)) {
+            // È un file regolare - aggiungilo alla collezione
+            add_file_to_collection(fc, full_path, entry_stats.st_size);
+            printf("File trovato: %s (%ld bytes)\n", full_path, entry_stats.st_size);
             
-            // Formato output
-            printf("   %c %-30s %8ld bytes  %s", 
-                   type_icon, 
-                   entry->d_name,
-                   entry_stats.st_size,
-                   ctime(&entry_stats.st_mtime));
+        } else if (S_ISDIR(entry_stats.st_mode)) {
+            // È una directory - ricorsione
+            printf("Directory trovata: %s (esplorando...)\n", full_path);
+            collect_all_files_recursive(full_path, fc);
+            
+        } else if (S_ISLNK(entry_stats.st_mode)) {
+            // È un link simbolico
+            printf("Link simbolico trovato: %s\n", full_path);
+            // Opzionale: puoi decidere se seguire i link o meno
             
         } else {
-            printf("   ❓ %-30s (stat error)\n", entry->d_name);
+            // Altri tipi di file (device, pipe, etc.)
+            printf("File speciale trovato: %s\n", full_path);
         }
     }
     
     closedir(dir);
-    
-    printf("\n📊 Totale: %d file, %d directory\n", file_count, dir_count);
+    return 0;
 }
 
-// Ricerca file ricorsiva
-void find_files_recursive(const char* directory_path, const char* pattern, int depth) {
+// Esempio di utilizzo principale
+void collect_all_files_example() {
+    printf("=== RACCOLTA COMPLETA DI TUTTI I FILE ===\n");
+    
+    // Directory da esplorare (può essere cambiata)
+    const char* target_directory = "/tmp";  // Cambia con la directory desiderata
+    
+    // Inizializza collezione
+    FileCollection* fc = init_file_collection();
+    
+    printf("Inizio raccolta di tutti i file da: %s\n\n", target_directory);
+    
+    // Raccoglie tutti i file ricorsivamente
+    if (collect_all_files_recursive(target_directory, fc) == 0) {
+        printf("\n=== RISULTATI RACCOLTA ===\n");
+        printf("Totale file trovati: %d\n", fc->file_count);
+        printf("Spazio totale: %ld bytes (%.2f MB)\n", 
+               fc->total_size, fc->total_size / (1024.0 * 1024.0));
+        
+        printf("\nElenco completo file:\n");
+        for (int i = 0; i < fc->file_count; i++) {
+            printf("%4d. %s\n", i + 1, fc->file_paths[i]);
+        }
+        
+    } else {
+        printf("Errore durante la raccolta file\n");
+    }
+    
+    // Cleanup
+    free_file_collection(fc);
+}
+
+// Versione semplificata che stampa solo i percorsi
+void print_all_files_recursive(const char* directory_path, int depth) {
     DIR* dir;
     struct dirent* entry;
     struct stat entry_stats;
-    char full_path[512];
+    char full_path[1024];
     
-    // Limita profondità ricorsione
-    if (depth > 10) {
-        printf("⚠️  Profondità massima raggiunta\n");
-        return;
+    // Indentazione per mostrare la gerarchia
+    for (int i = 0; i < depth; i++) {
+        printf("  ");
     }
+    printf("+ %s/\n", directory_path);
     
     dir = opendir(directory_path);
     if (dir == NULL) {
-        // Non stampare errore per directory senza permessi
         return;
     }
     
     while ((entry = readdir(dir)) != NULL) {
-        // Salta . e ..
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
             continue;
         }
         
         snprintf(full_path, sizeof(full_path), "%s/%s", directory_path, entry->d_name);
         
-        if (stat(full_path, &entry_stats) != 0) {
-            continue;
-        }
-        
-        // Se è un file e matcha il pattern
-        if (S_ISREG(entry_stats.st_mode)) {
-            if (strstr(entry->d_name, pattern) != NULL) {
-                printf("🔍 Trovato: %s (%ld bytes)\n", full_path, entry_stats.st_size);
+        if (stat(full_path, &entry_stats) == 0) {
+            // Indentazione
+            for (int i = 0; i <= depth; i++) {
+                printf("  ");
             }
-        }
-        
-        // Se è una directory, ricorsione
-        if (S_ISDIR(entry_stats.st_mode)) {
-            find_files_recursive(full_path, pattern, depth + 1);
+            
+            if (S_ISREG(entry_stats.st_mode)) {
+                printf("- %s (%ld bytes)\n", entry->d_name, entry_stats.st_size);
+            } else if (S_ISDIR(entry_stats.st_mode)) {
+                // Ricorsione per subdirectory
+                print_all_files_recursive(full_path, depth + 1);
+            } else {
+                printf("? %s (special)\n", entry->d_name);
+            }
         }
     }
     
     closedir(dir);
 }
 
-// Creazione struttura directory
-int create_directory_structure(const char* base_path) {
-    printf("=== CREAZIONE STRUTTURA DIRECTORY ===\n");
+// Raccolta file con filtri
+typedef struct {
+    char **extensions;
+    int ext_count;
+    long max_size;
+    long min_size;
+} FileFilter;
+
+int matches_filter(const char* filename, const struct stat* stats, FileFilter* filter) {
+    // Controllo dimensione
+    if (filter->max_size > 0 && stats->st_size > filter->max_size) {
+        return 0;
+    }
+    if (filter->min_size > 0 && stats->st_size < filter->min_size) {
+        return 0;
+    }
+    
+    // Controllo estensioni
+    if (filter->ext_count > 0) {
+        char* ext = strrchr(filename, '.');
+        if (!ext) return 0;  // Nessuna estensione
+        
+        for (int i = 0; i < filter->ext_count; i++) {
+            if (strcmp(ext, filter->extensions[i]) == 0) {
+                return 1;
+            }
+        }
+        return 0;  // Estensione non nella lista
+    }
+    
+    return 1;  // Nessun filtro o tutti i filtri passati
+}
+
+int collect_filtered_files_recursive(const char* directory_path, FileCollection* fc, FileFilter* filter) {
+    DIR* dir;
+    struct dirent* entry;
+    struct stat entry_stats;
+    char full_path[1024];
+    
+    dir = opendir(directory_path);
+    if (dir == NULL) {
+        return -1;
+    }
+    
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
+        }
+        
+        snprintf(full_path, sizeof(full_path), "%s/%s", directory_path, entry->d_name);
+        
+        if (stat(full_path, &entry_stats) == 0) {
+            if (S_ISREG(entry_stats.st_mode)) {
+                // Applica filtri
+                if (matches_filter(entry->d_name, &entry_stats, filter)) {
+                    add_file_to_collection(fc, full_path, entry_stats.st_size);
+                    printf("File filtrato: %s (%ld bytes)\n", full_path, entry_stats.st_size);
+                }
+            } else if (S_ISDIR(entry_stats.st_mode)) {
+                // Ricorsione per subdirectory
+                collect_filtered_files_recursive(full_path, fc, filter);
+            }
+        }
+    }
+    
+    closedir(dir);
+    return 0;
+}
+
+// Esempio con filtri
+void filtered_file_collection_example() {
+    printf("\n=== RACCOLTA FILE CON FILTRI ===\n");
+    
+    const char* target_directory = "/usr/share/doc";  // Directory di esempio
+    
+    // Setup filtri
+    FileFilter filter;
+    char* extensions[] = {".txt", ".md", ".html", ".xml"};
+    filter.extensions = extensions;
+    filter.ext_count = 4;
+    filter.max_size = 1024 * 1024;  // Max 1MB
+    filter.min_size = 100;          // Min 100 bytes
+    
+    FileCollection* fc = init_file_collection();
+    
+    printf("Cercando file con estensioni: .txt, .md, .html, .xml\n");
+    printf("Dimensione tra 100 bytes e 1MB\n");
+    printf("Directory: %s\n\n", target_directory);
+    
+    if (collect_filtered_files_recursive(target_directory, fc, &filter) == 0) {
+        printf("\n=== RISULTATI FILTRATI ===\n");
+        printf("File trovati: %d\n", fc->file_count);
+        printf("Spazio totale: %ld bytes\n", fc->total_size);
+        
+        // Mostra primi 20 risultati
+        int max_show = fc->file_count < 20 ? fc->file_count : 20;
+        printf("\nPrimi %d risultati:\n", max_show);
+        for (int i = 0; i < max_show; i++) {
+            printf("%3d. %s\n", i + 1, fc->file_paths[i]);
+        }
+        
+        if (fc->file_count > 20) {
+            printf("... e altri %d file\n", fc->file_count - 20);
+        }
+    }
+    
+    free_file_collection(fc);
+}
+
+// Crea struttura di test per dimostrare la raccolta
+int create_test_directory_structure(const char* base_path) {
+    printf("=== CREAZIONE STRUTTURA DI TEST ===\n");
     
     char path[256];
     
@@ -533,10 +480,13 @@ int create_directory_structure(const char* base_path) {
         perror("mkdir base");
         return -1;
     }
-    printf("📁 Creata directory base: %s\n", base_path);
+    printf("Directory base creata: %s\n", base_path);
     
     // Crea sottodirectory
-    const char* subdirs[] = {"docs", "src", "bin", "tests", "logs"};
+    const char* subdirs[] = {
+        "docs", "src", "bin", "tests", "logs",
+        "docs/manual", "docs/api", "src/core", "src/utils"
+    };
     int num_subdirs = sizeof(subdirs) / sizeof(subdirs[0]);
     
     for (int i = 0; i < num_subdirs; i++) {
@@ -546,16 +496,24 @@ int create_directory_structure(const char* base_path) {
             perror("mkdir subdir");
             continue;
         }
-        printf("📁 Creata subdirectory: %s\n", path);
+        printf("Subdirectory creata: %s\n", path);
     }
     
-    // Crea alcuni file di test
+    // Crea file di test
     const char* test_files[] = {
-        "docs/readme.txt",
-        "src/main.c", 
+        "README.md",
+        "docs/manual/user_guide.txt",
+        "docs/manual/install.md", 
+        "docs/api/reference.html",
+        "src/main.c",
         "src/utils.c",
-        "tests/test1.c",
-        "logs/app.log"
+        "src/core/engine.c",
+        "src/core/config.h",
+        "tests/test_main.c",
+        "tests/test_utils.c",
+        "bin/app",
+        "logs/error.log",
+        "logs/access.log"
     };
     int num_files = sizeof(test_files) / sizeof(test_files[0]);
     
@@ -564,138 +522,90 @@ int create_directory_structure(const char* base_path) {
         
         int fd = open(path, O_CREAT | O_WRONLY | O_TRUNC, 0644);
         if (fd != -1) {
-            char content[128];
-            snprintf(content, sizeof(content), "File di test: %s\nCreato il: %ld\n", 
-                    test_files[i], time(NULL));
+            char content[256];
+            snprintf(content, sizeof(content), 
+                    "File di test: %s\nCreato il: %ld\nNumero riga: %d\n", 
+                    test_files[i], time(NULL), i);
             write(fd, content, strlen(content));
             close(fd);
-            printf("📄 Creato file: %s\n", path);
+            printf("File creato: %s\n", path);
         }
     }
     
     return 0;
 }
 
-// Rimozione ricorsiva directory
+// Esempio completo con test
+void complete_directory_traversal_example() {
+    printf("=== ESEMPIO COMPLETO TRAVERSAL DIRECTORY ===\n");
+    
+    const char* test_dir = "test_complete_traversal";
+    
+    // 1. Crea struttura di test
+    create_test_directory_structure(test_dir);
+    
+    // 2. Raccoglie tutti i file
+    printf("\n=== RACCOLTA TUTTI I FILE ===\n");
+    collect_all_files_example_local(test_dir);
+    
+    // 3. Stampa struttura ad albero
+    printf("\n=== STRUTTURA AD ALBERO ===\n");
+    print_all_files_recursive(test_dir, 0);
+    
+    // 4. Raccolta con filtri
+    printf("\n=== RACCOLTA CON FILTRI (.c e .h) ===\n");
+    FileFilter filter;
+    char* extensions[] = {".c", ".h"};
+    filter.extensions = extensions;
+    filter.ext_count = 2;
+    filter.max_size = 0;  // Nessun limite
+    filter.min_size = 0;
+    
+    FileCollection* fc = init_file_collection();
+    collect_filtered_files_recursive(test_dir, fc, &filter);
+    
+    printf("File C/H trovati: %d\n", fc->file_count);
+    for (int i = 0; i < fc->file_count; i++) {
+        printf("  %s\n", fc->file_paths[i]);
+    }
+    
+    free_file_collection(fc);
+    
+    // 5. Cleanup
+    printf("\n=== CLEANUP ===\n");
+    remove_directory_recursive(test_dir);
+    
+    printf("Esempio completo terminato\n");
+}
+
+// Versione locale della funzione per il test
+void collect_all_files_example_local(const char* directory) {
+    FileCollection* fc = init_file_collection();
+    
+    printf("Raccogliendo tutti i file da: %s\n", directory);
+    
+    if (collect_all_files_recursive(directory, fc) == 0) {
+        printf("Totale file: %d\n", fc->file_count);
+        printf("Spazio totale: %ld bytes\n", fc->total_size);
+        
+        for (int i = 0; i < fc->file_count; i++) {
+            printf("  %s\n", fc->file_paths[i]);
+        }
+    }
+    
+    free_file_collection(fc);
+}
+
+// Rimozione ricorsiva directory (per cleanup)
 int remove_directory_recursive(const char* directory_path) {
     DIR* dir;
     struct dirent* entry;
     struct stat entry_stats;
     char full_path[512];
-    int removed_files = 0, removed_dirs = 0;
     
     dir = opendir(directory_path);
     if (dir == NULL) {
-        perror("opendir for removal");
         return -1;
-    }
-    
-    while ((entry = readdir(dir)) != NULL) {
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-            continue;
-        }
-        
-        snprintf(full_path, sizeof(full_path), "%s/%s", directory_path, entry->d_name);
-        
-        if (stat(full_path, &entry_stats) != 0) {
-            continue;
-        }
-        
-        if (S_ISDIR(entry_stats.st_mode)) {
-            // Ricorsione per subdirectory
-            remove_directory_recursive(full_path);
-            
-            if (rmdir(full_path) == 0) {
-                removed_dirs++;
-                printf("🗑️  Rimossa directory: %s\n", full_path);
-            }
-        } else {
-            // Rimuovi file
-            if (unlink(full_path) == 0) {
-                removed_files++;
-                printf("🗑️  Rimosso file: %s\n", full_path);
-            }
-        }
-    }
-    
-    closedir(dir);
-    
-    // Rimuovi directory corrente
-    if (rmdir(directory_path) == 0) {
-        removed_dirs++;
-        printf("🗑️  Rimossa directory: %s\n", directory_path);
-    }
-    
-    printf("📊 Rimozione completata: %d file, %d directory\n", removed_files, removed_dirs);
-    return 0;
-}
-
-// Copia directory ricorsiva
-int copy_directory_recursive(const char* source_dir, const char* dest_dir) {
-    DIR* dir;
-    struct dirent* entry;
-    struct stat entry_stats;
-    char src_path[512], dst_path[512];
-    int copied_files = 0, created_dirs = 0;
-    
-    // Crea directory destinazione
-    if (mkdir(dest_dir, 0755) != 0 && errno != EEXIST) {
-        perror("mkdir destination");
-        return -1;
-    }
-    created_dirs++;
-    
-    dir = opendir(source_dir);
-    if (dir == NULL) {
-        perror("opendir source");
-        return -1;
-    }
-    
-    while ((entry = readdir(dir)) != NULL) {
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-            continue;
-        }
-        
-        snprintf(src_path, sizeof(src_path), "%s/%s", source_dir, entry->d_name);
-        snprintf(dst_path, sizeof(dst_path), "%s/%s", dest_dir, entry->d_name);
-        
-        if (stat(src_path, &entry_stats) != 0) {
-            continue;
-        }
-        
-        if (S_ISDIR(entry_stats.st_mode)) {
-            // Ricorsione per subdirectory
-            int result = copy_directory_recursive(src_path, dst_path);
-            if (result > 0) {
-                created_dirs += result;
-            }
-        } else if (S_ISREG(entry_stats.st_mode)) {
-            // Copia file
-            if (copy_file(src_path, dst_path) > 0) {
-                copied_files++;
-                printf("📋 Copiato: %s -> %s\n", src_path, dst_path);
-            }
-        }
-    }
-    
-    closedir(dir);
-    
-    printf("📊 Copia directory: %d file, %d directory\n", copied_files, created_dirs);
-    return created_dirs;
-}
-
-// Directory walker con callback
-typedef void (*file_callback_t)(const char* filepath, const struct stat* stats, void* userdata);
-
-void walk_directory(const char* directory_path, file_callback_t callback, void* userdata) {
-    DIR* dir;
-    struct dirent* entry;
-    struct stat entry_stats;
-    char full_path[512];
-    
-    dir = opendir(directory_path);
-    if (dir == NULL) {
-        return;
     }
     
     while ((entry = readdir(dir)) != NULL) {
@@ -706,364 +616,141 @@ void walk_directory(const char* directory_path, file_callback_t callback, void* 
         snprintf(full_path, sizeof(full_path), "%s/%s", directory_path, entry->d_name);
         
         if (stat(full_path, &entry_stats) == 0) {
-            // Chiama callback per questo file/directory
-            callback(full_path, &entry_stats, userdata);
-            
-            // Ricorsione per directory
             if (S_ISDIR(entry_stats.st_mode)) {
-                walk_directory(full_path, callback, userdata);
+                remove_directory_recursive(full_path);
+                rmdir(full_path);
+            } else {
+                unlink(full_path);
             }
         }
     }
     
     closedir(dir);
+    rmdir(directory_path);
+    
+    return 0;
 }
 
-// Callback esempio: calcola spazio totale
-void calculate_size_callback(const char* filepath, const struct stat* stats, void* userdata) {
-    long* total_size = (long*)userdata;
+// Funzione main di esempio
+int main() {
+    // Esempio base file I/O
+    basic_file_io_example();
     
-    if (S_ISREG(stats->st_mode)) {
-        *total_size += stats->st_size;
+    // Esempio completo directory traversal
+    complete_directory_traversal_example();
+    
+    // Esempio raccolta file esistenti
+    printf("\n=== PROVA SU DIRECTORY REALE ===\n");
+    printf("Raccogliendo file da /etc (primi 50):\n");
+    
+    FileCollection* fc = init_file_collection();
+    collect_all_files_recursive("/etc", fc);
+    
+    int max_show = fc->file_count < 50 ? fc->file_count : 50;
+    printf("Mostrando primi %d di %d file trovati:\n", max_show, fc->file_count);
+    
+    for (int i = 0; i < max_show; i++) {
+        printf("%3d. %s\n", i + 1, fc->file_paths[i]);
     }
-}
-
-// Callback esempio: conta file per tipo
-typedef struct {
-    int regular_files;
-    int directories;
-    int symlinks;
-    int other;
-} FileTypeCount;
-
-void count_types_callback(const char* filepath, const struct stat* stats, void* userdata) {
-    FileTypeCount* counts = (FileTypeCount*)userdata;
     
-    if (S_ISREG(stats->st_mode)) {
-        counts->regular_files++;
-    } else if (S_ISDIR(stats->st_mode)) {
-        counts->directories++;
-    } else if (S_ISLNK(stats->st_mode)) {
-        counts->symlinks++;
-    } else {
-        counts->other++;
-    }
-}
-
-// Esempio completo directory management
-void directory_management_example() {
-    printf("=== ESEMPIO COMPLETO DIRECTORY MANAGEMENT ===\n");
+    free_file_collection(fc);
     
-    const char* test_dir = "test_project";
-    const char* copy_dir = "test_project_copy";
-    
-    // 1. Crea struttura directory
-    create_directory_structure(test_dir);
-    
-    // 2. Lista contenuto
-    printf("\n📋 Lista contenuto directory principale:\n");
-    list_directory_contents(test_dir);
-    
-    // 3. Ricerca file
-    printf("\n🔍 Ricerca file '*.c':\n");
-    find_files_recursive(test_dir, ".c", 0);
-    
-    // 4. Calcola spazio totale
-    printf("\n📊 Calcolo spazio totale:\n");
-    long total_size = 0;
-    walk_directory(test_dir, calculate_size_callback, &total_size);
-    printf("Spazio totale utilizzato: %ld bytes\n", total_size);
-    
-    // 5. Conta tipi file
-    printf("\n📈 Conteggio tipi file:\n");
-    FileTypeCount counts = {0, 0, 0, 0};
-    walk_directory(test_dir, count_types_callback, &counts);
-    printf("File regolari: %d\n", counts.regular_files);
-    printf("Directory: %d\n", counts.directories);
-    printf("Symbolic link: %d\n", counts.symlinks);
-    printf("Altri: %d\n", counts.other);
-    
-    // 6. Copia directory
-    printf("\n📋 Copia directory:\n");
-    copy_directory_recursive(test_dir, copy_dir);
-    
-    // 7. Verifica copia
-    printf("\n✅ Verifica copia:\n");
-    list_directory_contents(copy_dir);
-    
-    // 8. Cleanup
-    printf("\n🗑️  Cleanup:\n");
-    remove_directory_recursive(test_dir);
-    remove_directory_recursive(copy_dir);
-    
-    printf("✅ Directory management example completato\n");
+    return 0;
 }
 ```
 
 ---
 
-## 🛠️ Utility File I/O Avanzate
+## Funzione Ready-to-Use per Raccolta File
 
 ```c
-// File mapping in memoria
-#include <sys/mman.h>
-
-typedef struct {
-    void* mapped_data;
-    size_t file_size;
-    int fd;
-} MappedFile;
-
-MappedFile* map_file_readonly(const char* filename) {
-    MappedFile* mf = malloc(sizeof(MappedFile));
-    struct stat stats;
+// Funzione semplice e pronta all'uso per raccogliere tutti i file
+int get_all_files_from_directory(const char* directory_path, 
+                                 char*** file_list, 
+                                 int* file_count) {
+    FileCollection* fc = init_file_collection();
     
-    mf->fd = open(filename, O_RDONLY);
-    if (mf->fd == -1) {
-        free(mf);
-        return NULL;
+    if (collect_all_files_recursive(directory_path, fc) != 0) {
+        free_file_collection(fc);
+        return -1;
     }
     
-    if (fstat(mf->fd, &stats) == -1) {
-        close(mf->fd);
-        free(mf);
-        return NULL;
-    }
+    // Trasferisci risultati
+    *file_list = fc->file_paths;
+    *file_count = fc->file_count;
     
-    mf->file_size = stats.st_size;
-    mf->mapped_data = mmap(NULL, mf->file_size, PROT_READ, MAP_PRIVATE, mf->fd, 0);
+    // Non liberare i path perché li stiamo restituendo
+    free(fc);
     
-    if (mf->mapped_data == MAP_FAILED) {
-        close(mf->fd);
-        free(mf);
-        return NULL;
-    }
-    
-    return mf;
+    return 0;
 }
 
-void unmap_file(MappedFile* mf) {
-    if (mf) {
-        munmap(mf->mapped_data, mf->file_size);
-        close(mf->fd);
-        free(mf);
-    }
-}
-
-// File watcher semplice
-typedef struct {
-    char filename[256];
-    time_t last_modified;
-    off_t last_size;
-} FileWatcher;
-
-FileWatcher* create_file_watcher(const char* filename) {
-    FileWatcher* fw = malloc(sizeof(FileWatcher));
-    struct stat stats;
+// Esempio di utilizzo della funzione ready-to-use
+void example_usage() {
+    char** all_files;
+    int total_files;
     
-    strncpy(fw->filename, filename, sizeof(fw->filename) - 1);
-    
-    if (stat(filename, &stats) == 0) {
-        fw->last_modified = stats.st_mtime;
-        fw->last_size = stats.st_size;
-    } else {
-        fw->last_modified = 0;
-        fw->last_size = 0;
-    }
-    
-    return fw;
-}
-
-typedef enum {
-    FILE_UNCHANGED,
-    FILE_MODIFIED,
-    FILE_CREATED,
-    FILE_DELETED
-} FileChangeType;
-
-FileChangeType check_file_changes(FileWatcher* fw) {
-    struct stat stats;
-    
-    if (stat(fw->filename, &stats) == 0) {
-        if (fw->last_modified == 0) {
-            // File creato
-            fw->last_modified = stats.st_mtime;
-            fw->last_size = stats.st_size;
-            return FILE_CREATED;
-        } else if (stats.st_mtime != fw->last_modified || stats.st_size != fw->last_size) {
-            // File modificato
-            fw->last_modified = stats.st_mtime;
-            fw->last_size = stats.st_size;
-            return FILE_MODIFIED;
-        } else {
-            return FILE_UNCHANGED;
+    // Ottieni tutti i file dalla directory
+    if (get_all_files_from_directory("/home/user/documents", &all_files, &total_files) == 0) {
+        printf("Trovati %d file:\n", total_files);
+        
+        for (int i = 0; i < total_files; i++) {
+            printf("%s\n", all_files[i]);
+            free(all_files[i]);  // Libera ogni path
         }
+        
+        free(all_files);  // Libera l'array di puntatori
     } else {
-        if (fw->last_modified != 0) {
-            // File cancellato
-            fw->last_modified = 0;
-            fw->last_size = 0;
-            return FILE_DELETED;
-        } else {
-            return FILE_UNCHANGED;
-        }
+        printf("Errore nella raccolta file\n");
     }
-}
-
-// Lettura file per linee
-typedef struct {
-    FILE* file;
-    char* line_buffer;
-    size_t buffer_size;
-    int line_number;
-} LineReader;
-
-LineReader* create_line_reader(const char* filename) {
-    LineReader* lr = malloc(sizeof(LineReader));
-    
-    lr->file = fopen(filename, "r");
-    if (!lr->file) {
-        free(lr);
-        return NULL;
-    }
-    
-    lr->line_buffer = malloc(1024);
-    lr->buffer_size = 1024;
-    lr->line_number = 0;
-    
-    return lr;
-}
-
-char* read_next_line(LineReader* lr) {
-    if (getline(&lr->line_buffer, &lr->buffer_size, lr->file) != -1) {
-        lr->line_number++;
-        // Rimuovi newline finale
-        lr->line_buffer[strcspn(lr->line_buffer, "\n")] = 0;
-        return lr->line_buffer;
-    }
-    return NULL;
-}
-
-void destroy_line_reader(LineReader* lr) {
-    if (lr) {
-        if (lr->file) fclose(lr->file);
-        free(lr->line_buffer);
-        free(lr);
-    }
-}
-
-// File backup con timestamp
-int backup_file(const char* filename) {
-    char backup_name[512];
-    time_t now = time(NULL);
-    struct tm* tm_info = localtime(&now);
-    
-    snprintf(backup_name, sizeof(backup_name), "%s.backup_%04d%02d%02d_%02d%02d%02d",
-             filename,
-             tm_info->tm_year + 1900,
-             tm_info->tm_mon + 1,
-             tm_info->tm_mday,
-             tm_info->tm_hour,
-             tm_info->tm_min,
-             tm_info->tm_sec);
-    
-    return copy_file(filename, backup_name);
-}
-
-// Atomic file write
-int atomic_write_file(const char* filename, const void* data, size_t data_size) {
-    char temp_filename[512];
-    snprintf(temp_filename, sizeof(temp_filename), "%s.tmp.%d", filename, getpid());
-    
-    // Scrivi su file temporaneo
-    int fd = open(temp_filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-    if (fd == -1) {
-        return -1;
-    }
-    
-    ssize_t written = write(fd, data, data_size);
-    if (written != data_size) {
-        close(fd);
-        unlink(temp_filename);
-        return -1;
-    }
-    
-    // Forza scrittura su disco
-    if (fsync(fd) == -1) {
-        close(fd);
-        unlink(temp_filename);
-        return -1;
-    }
-    
-    close(fd);
-    
-    // Rename atomico
-    if (rename(temp_filename, filename) == -1) {
-        unlink(temp_filename);
-        return -1;
-    }
-    
-    return written;
 }
 ```
 
 ---
 
-## 📋 Checklist File I/O
+## Checklist Directory Traversal
 
-### ✅ **System Calls Base**
-- [ ] `open()` con flag appropriati (O_RDONLY, O_WRONLY, O_RDWR)
-- [ ] Controlla errori su tutte le operazioni
-- [ ] `close()` sempre i file descriptor
-- [ ] Usa `read()`/`write()` per accesso a basso livello
-- [ ] `lseek()` per posizionamento nel file
+### **Traversal Completo**
+- [ ] Usa `opendir()`, `readdir()`, `closedir()` per attraversare directory
+- [ ] Controlla sempre il tipo di file con `stat()` o `entry->d_type`
+- [ ] Implementa ricorsione per subdirectory
+- [ ] Gestisci casi di errore (permessi, directory inesistenti)
+- [ ] Evita loop infiniti (skip "." e "..")
 
-### ✅ **Directory Operations**
-- [ ] `opendir()`/`readdir()`/`closedir()` per listing
-- [ ] `mkdir()`/`rmdir()` per gestione directory
-- [ ] `stat()`/`fstat()`/`lstat()` per informazioni file
-- [ ] Ricorsione per operazioni su alberi directory
-- [ ] Gestione permessi con `chmod()`/`chown()`
+### **Raccolta File**
+- [ ] Alloca dinamicamente memoria per lista file
+- [ ] Ridimensiona array quando necessario (`realloc()`)
+- [ ] Salva path completi, non solo nomi file
+- [ ] Traccia statistiche (count, dimensioni totali)
+- [ ] Libera sempre la memoria allocata
 
-### ✅ **Best Practices**
-- [ ] Controllo errori su ogni system call
-- [ ] Cleanup risorse (close FD, free memoria)
-- [ ] Gestione permessi e sicurezza
-- [ ] Operazioni atomiche per consistency
-- [ ] Backup prima di modifiche critiche
+### **Sicurezza e Performance**
+- [ ] Limita profondità ricorsione per evitare stack overflow
+- [ ] Gestisci permessi negati senza terminare il programma
+- [ ] Evita seguire link simbolici se non necessario
+- [ ] Usa buffer appropriati per path lunghi
+- [ ] Controlla ritorno di tutte le system call
 
 ---
 
-## 🎯 Compilazione e Test
+## Compilazione e Test
 
 ```bash
-# Compila esempi
-gcc -o file_io file_io_examples.c
+# Compila il programma
+gcc -o directory_traversal directory_traversal.c
 
-# Test con file grandi
-dd if=/dev/zero of=large_file.txt bs=1M count=100
+# Test su directory piccola
+./directory_traversal
 
-# Test permessi
-chmod 755 test_program
-chmod 644 data_file.txt
+# Test su directory sistema (con attenzione)
+sudo ./directory_traversal
 
-# Monitor I/O
-iostat -x 1
+# Conta quanti file trova
+./directory_traversal | grep "File trovato" | wc -l
 
-# Debug file operations
-strace -e trace=file ./file_io
+# Performance test
+time ./directory_traversal
 
-# Test filesystem
-df -h
-du -sh directory/
+# Memory check
+valgrind --leak-check=full ./directory_traversal
 ```
-
-## 🚀 Performance File I/O
-
-| **Operazione** | **System Call** | **Buffered I/O** |
-|----------------|-----------------|-------------------|
-| **Overhead** | Basso | Medio |
-| **Controllo** | Completo | Limitato |
-| **Portabilità** | Unix/Linux | Standard C |
-| **Buffer** | Manuale | Automatico |
-| **Performance** | Ottimizzabile | Buona di default |

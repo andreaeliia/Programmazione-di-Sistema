@@ -1,0 +1,97 @@
+Testo in italiano
+
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux2.unisalento.it una directory denominata
+proprioaccount.esameSNP24 (es.franco.esameSNP24) e svolgere l'esercizio in tale directory
+o, in alternativa, creare una directory con lo stesso nome nella propria home macOS,
+svolgere gli esercizi in tale directory e, alla fine della prova, trasferirla nella
+propria home su hplinux2.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di makefile. Anche nel
+caso in cui non sia possibile risolvere il problema in accordo con lo standard, la
+soluzione deve comunque funzionare su Linux e macOS. Nella directory si DEVE anche creare
+un file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le soluzioni oltre
+ad eventuali commenti e/o osservazioni. Si fa presente che il contenuto di tale file
+permette spesso una migliore comprensione della logica seguita nello svolgimento e, di
+conseguenza, la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP24.tgz $USER.esameSNP24
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito sulla macchina Linux,
+DOPO che la cartella proprioaccount.esameSNP24 è stata trasferita sulla propria home su
+hplinux2.unisalento.it e NON mentre è ancora nella propria home su macOS (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la consegna del
+compito, di fare riferimento alla pagina web: 
+http://www.liis.it/mw/index.php/LiiS:Istruzioni ]
+
+
+Esercizio
+
+In un sistema client-server, i client possono assumere una qualunque posizione in 
+una matrice 200x200 e permettere ai loro utenti di modificarla tramite i tasti "u" (alto), 
+"n" (basso), "h" (sinistra), "j" (destra).
+Quando gli spostamenti di un client A lo portano a sovrapporsi alla posizione di un 
+client B, il client B viene eliminato dalla matrice e termina la sua partecipazione.
+Il server riceve in tempo reale informazioni sulla posizione di tutti i client e 
+trasmette periodicamente ai client in modalità multicast la posizione di tutti i
+client e le notizie su eventuali eliminazioni.
+L'ultimo client attivo viene informato dal server della chiusura di tutte le attività.
+Ciascun candidato usi per le attività multicast dei programmi l'indirizzo 230.0.0.xxx, 
+dove xxx è il quarto campo del proprio indirizzo IP in notazione decimale quadripuntata.
+Per le trasmissioni unicast al server il candidato usi la porta numero 7jkh  
+(con jkh uguale a xxx, j=0 se xxx < 100)
+_____________________________________________________________________________ 
+English text
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP24 in your home on
+hplinux2.unisalento.it (e.g. franco.esameSNP24) and solve the exercise in that directory
+or, alternatively, create a directory with the same name in your macOS home, and solve the
+exercise in that directory. Eventually, transfer it to your home on
+hplinux2.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be provided. If the
+solution and the compliance are not possible together, the solution must anyway be working
+both on Linux and macOS. In the same directory, a file named README.txt containing a
+description of the solution and, possibly, comments/observations on the choices made to
+solve the problem, MUST be placed. Keep in mind that the file may help the reader to
+understand the logic you adopted and to better appreciate your work.
+
+When finished, execute in your own Linux account the following command line:
+
+cd; tar cvfz $USER.esameSNP24.tgz $USER.esameSNP24
+
+[BEWARE: the command above shown must be issued in the shell running in the Linux machine,
+AFTER the folder youraccount.esameSNP24 has been transferred to your home on
+hplinux2.unisalento.it and NOT when it's still in your home on macOS (if you wrote the
+program there). For any doubt about the way to carry on the exercise and how to hand it
+in, please read the web page (still in italian, sorry, soon to be translated in english):
+http://www.liis.it/mw/index.php/LiiS:Istruzioni]
+
+Exercise
+
+In a client-server system, the clients can reach any position in a 200x200 matrix and the
+user of each client can modify its position by pressing the following keys: "u" (up), 
+"n" (down), "h" (left), "j" (right).
+When a client A moves over the position of a client B, the latter is removed from the 
+matrix and it is terminated.
+The server receives information from the clients in real-time and it periodically sends 
+by multicast to clients the updated positions of all clients and news about removals.
+The last active client is informed by the server about the termination of all activities.
+Each candidate must use for the programs' multicast activities the address 230.0.0.xxx,
+where xxx is the fourth field of his/her own IP address expressed in quad-dotted
+decimal notation.
+For unicast transmissions to the server, port number 7jkh must be used (jkh = xxx, 
+j=0 if xxx < 100)
+
+
+
+
+
+
+
+

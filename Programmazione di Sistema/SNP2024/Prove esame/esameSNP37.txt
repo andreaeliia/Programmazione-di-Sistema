@@ -1,0 +1,52 @@
+Testo in italiano
+
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux2.unisalento.it una directory
+denominata proprioaccount.esameSNP37 (es.franco.esameSNP37) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria
+home su hplinux2.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di
+makefile. Anche nel caso in cui non sia possibile risolvere il
+problema in accordo con lo standard, la soluzione deve comunque
+funzionare su Linux e macOS. Nella directory si DEVE anche creare un
+file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le
+soluzioni oltre ad eventuali commenti e/o osservazioni. Si fa presente
+che il contenuto di tale file permette spesso una migliore
+comprensione della logica seguita nello svolgimento e, di conseguenza,
+la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP37.tgz $USER.esameSNP37
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP37 è
+stata trasferita sulla propria home su hplinux2.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la
+consegna del compito, di fare riferimento alla pagina web: 
+http://www.liis.it/mw/index.php/LiiS:Istruzioni ]
+
+Esercizio
+
+Dato l'insieme coordinato di processi rappresentato dal grafo nella
+figura "grafo1.png" indicante l'ordine di precedenza con il quale i
+processi da P1 a P8 devono essere eseguiti, realizzarlo utilizzando il
+minimo numero possibile di semafori POSIX. I processi rappresentati
+devono essere processi ciclici (con corpo del tipo while(1)). Gli archi
+tratteggiati indicano che solo due rami (tra i rami P4, P5/P6, e P7)
+devono essere eseguiti (arbitrariamente) per ogni iterazione (ovvero
+devono essere eseguiti P4 e P5/P6, oppure P7 e P5/P6 oppure ancora P4 e
+P7).
+Utilizzare un processo esterno per l'avvio del sistema.
+______________________________________________________________________
+English text
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+To be provided soon
+

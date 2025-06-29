@@ -1,0 +1,9 @@
+digraph "doxy/html/search" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_642fd44dd3fea087fc182af705d746d9 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="html" fontname="Helvetica", fontsize="10", URL="dir_642fd44dd3fea087fc182af705d746d9.html"]
+  dir_9618c4ac0d8fa6235f8e7cc35933f858 [shape=box, label="search", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_9618c4ac0d8fa6235f8e7cc35933f858.html"];
+  }
+}

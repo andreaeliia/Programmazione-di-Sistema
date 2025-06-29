@@ -1,0 +1,45 @@
+[Attenzione: questo è un testo codificato in UTF-8]
+
+Creare nella propria home su hplinux3.unisalento.it una directory
+denominata proprioaccount.esameSNP58 (es.franco.esameSNP58) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria home
+su hplinux3.unisalento.it.
+
+I programmi creati devono essere eseguibili sia su macOS che su Linux.
+Nella directory si DEVE anche creare un file di nome "leggimi.txt" che
+descriva l'impostazione adottata per le soluzioni oltre ad eventuali
+commenti e/o osservazioni. Si fa presente che il contenuto di tale file
+permette spesso una migliore comprensione della logica seguita nello
+svolgimento e, di conseguenza, la sua presenza va a tutto vantaggio
+dell'esaminando.
+
+Aggiungere all'inizio di qualsiasi file creato una riga di commento
+contenente il proprio cognome, nome e numero di matricola.
+
+Alla fine, copiare, incollare ed eseguire, in un terminale con il quale
+si sia acceduto al proprio account Linux, la seguente linea di comando:
+
+cd; tar cvfz $USER.esameSNP58.tgz $USER.esameSNP58
+
+[ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP58 è
+stata trasferita sulla propria home su hplinux3.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è lavorato).]
+
+Esercizio
+
+Scrivere un programma con 
+
+1) una thread che visiti ricorsivamente tutti i nodi all'interno di una 
+directory passata come argomento registrando in un'area di memoria, per 
+ogni nodo visitato, la dimensione in byte del nodo e il numero di hard 
+link ad esso associato;
+
+2) una thread che accumuli in un contatore il numero totale di byte di
+tutti i nodi man mano che il risultato della visita viene prodotto
+dall'altra thread, omettendo l'incremento del contatore quando l'inode 
+di un nodo è stato già considerato, e lo stampi al termine della visita 
+dell'albero.  
+

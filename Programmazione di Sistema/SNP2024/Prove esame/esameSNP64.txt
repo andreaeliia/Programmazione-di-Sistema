@@ -1,0 +1,38 @@
+[ ATTENZIONE: questo è un testo codificato in UTF-8 ]
+
+Creare nella propria home su hplinux3.unisalento.it una directory
+denominata proprioaccount.esameSNP64 (es.franco.esameSNP64) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria
+home su hplinux3.unisalento.it.
+
+La soluzione deve rispettare lo standard SUSv3 ed essere completa di
+makefile. Anche nel caso in cui non sia possibile risolvere il
+problema in accordo con lo standard, la soluzione deve comunque
+funzionare su Linux e macOS. Nella directory si DEVE anche creare un
+file di nome "LEGGIMI.txt" che descriva l'impostazione adottata per le
+soluzioni oltre ad eventuali commenti e/o osservazioni. Si fa presente
+che il contenuto di tale file permette spesso una migliore
+comprensione della logica seguita nello svolgimento e, di conseguenza,
+la sua presenza va a tutto vantaggio dell'esaminando.
+
+Alla fine usare nel proprio account Linux la linea di comando:
+
+cd; tar cvfz $USER.esameSNP64.tgz $USER.esameSNP64
+
+[ ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP64 è
+stata trasferita sulla propria home su hplinux3.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è
+lavorato). Si raccomanda, per qualsiasi dubbio sullo svolgimento e la
+consegna del compito, di fare riferimento alla pagina web: 
+http://www.liis.it/mw/index.php/LiiS:Istruzioni ]
+
+Esercizio
+
+Scrivere un programma C che prenda come argomento un comando e lo lanci
+per 10 volte scrivendo al termine delle esecuzioni allo standard error
+le medie dei tempi di orologio, dei tempi di utente e dei tempi di 
+sistema consumati dal comando nei dieci lanci, con la precisione del
+microsecondo.

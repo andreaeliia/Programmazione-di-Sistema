@@ -1,0 +1,41 @@
+
+[ BEWARE: this text is UTF-8 encoded ]
+
+Please create  a directory named youraccount.esameSNP56 in your home on
+hplinux3.unisalento.it (e.g. franco.esameSNP56) and solve the exercise
+in that directory or, alternatively, create a directory with the same
+name in your macOS home, and solve the exercise in that directory.
+Eventually, transfer it to your home on hplinux3.unisalento.it.
+
+The created programs must be SUSv3 compliant and a makefile must be
+provided. If the solution and the compliance are not possible together,
+the solution must anyway be working both on Linux and macOS. In the same
+directory, a file named README.txt containing a description of the
+solution and, possibly, comments/observations on the choices made to
+solve the problem, MUST be placed. Keep in mind that the file may help
+the reader to understand the logic you adopted and to better appreciate
+your work.
+
+When finished, execute in your own Linux account the following command
+line:
+
+cd; tar cvfz $USER.esameSNP56.tgz $USER.esameSNP56
+
+[BEWARE: the command above shown must be issued in the shell running in
+the Linux machine, AFTER the folder youraccount.esameSNP56 has been
+transferred to your home on hplinux3.unisalento.it and NOT when it's
+still in your home on macOS (if you wrote the program there). ]
+
+Exercise
+
+Build two C programs named profile_fork.c and profile_thread.c that behave as following:
+1) profile_fork.c must launch 10 times a child executing a function called "dummy", executing whichever task at the candidate choice, and measures the clock, system and user times spent both for each execution and in total.
+2) profile_thread.c performs the same measurements but has instead the same function ("dummy" used by profile_fork) executed in sequence by 10 threads.
+
+
+
+
+
+
+
+

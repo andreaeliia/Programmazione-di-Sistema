@@ -94,7 +94,7 @@ void process_worker(int process_id, SharedMemory* shared_mem, sem_t* semaphore) 
 }
 
 int main(void) {
-    const char* filename = "shared_file.txt";
+    const char* filename = "shared_file.dat";
     int fd;
     SharedMemory* shared_mem;
     sem_t* semaphore;

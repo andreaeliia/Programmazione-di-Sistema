@@ -24,7 +24,7 @@ typedef struct {
     size_t file_size;
     int* current_offset; /*Offset correnmte nel file*/
 }shared_file_t;
-
+ /*commento meme*/
 /*========VARIABILI GLOBALI============*/
 sem_t *semaphore;
 int continua_esecuzione =1;

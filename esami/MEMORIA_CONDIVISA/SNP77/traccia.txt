@@ -1,0 +1,2 @@
+prod.c genera dei numeri casuali in una memoria mappata
+const1.c e const2.c leggono la memoria mappata, levano un array random, ed in seguito scrivono il record tolto in un file

@@ -1,0 +1,360 @@
+Capitolo 6 (Input/Output)
+
+Esempio 1.4 -> apue.3e/intro/mycat.c (Pag 29)
+Questo programma è un semplice copiatore da standard input a standard output, 
+molto simile al comando UNIX cat, ma scritto in C.
+
+Esempio 3.1 -> apue.3e/fileio/seek.c (Pag 33)
+Questo programma verifica se lo standard input (stdin) è seekable, cioè se è possibile spostare
+il "cursore" di lettura (come con file normali).
+
+Esempio 3.2 -> apue.3e/fileio/hole.c (Pag 34)
+Questo programma crea un file con un buco (hole), sfruttando la capacità dei filesystem Unix 
+di non allocare spazio fisico per i byte non scritti.
+
+Esempio 3.11 -> apue.3e/fileio/fileflags.c (Pag 41)
+Questo programma stampa le modalità di accesso associate a un file descriptor 
+passato come argomento, usando fcntl.
+
+Esempio 3.12 -> apue.3e/fileio/setfl.c (Pag 42)
+Questa funzione set_fl() imposta uno o più flag di stato su un file descriptor esistente, 
+utilizzando l’interfaccia fcntl().
+
+Esempio 4.16 -> apue.3e/filedir/unlink.c (Pag 45)
+Questo programma dimostra un comportamento tipico dei file Unix: l’eliminazione (unlink) di un 
+file aperto non ne cancella subito i dati, ma solo il collegamento dal filesystem.
+
+
+Capitolo 7 (Files e Directories)
+
+Esempio 1.3 -> apue.3e/intro/ls1.c 
+Questo programma è una versione semplificata del comando ls che stampa i nomi dei file 
+contenuti in una directory specificata come argomento.
+
+Esempio 4.3 -> apue.3e/filedir/filetype.c
+Questo programma determina e stampa il tipo di file per ogni nome passato come argomento, 
+usando la funzione lstat.
+
+Esempio 4.8 -> apue.3e/filedir/access.c
+Il programma verifica se il file specificato come argomento è leggibile per il processo 
+chiamante, prima usando access() e poi tentando realmente l'apertura in lettura con open().
+
+Esempio 4.9 -> apue.3e/filedir/umask.c
+Il programma crea due file (foo e bar) con permessi diversi, dimostrando 
+l’effetto della maschera di permessi umask sulla creazione dei file.
+
+Esempio 4.12 -> apue.3e/filedir/changemod.c
+Il programma modifica i permessi di due file, foo e bar, dimostrando l’uso di chmod per cambiare bit 
+specifici (come il set-group-ID) o per impostare un modo assoluto di accesso.
+
+Esempio 4.21 -> apue.3e/filedir/zap.c
+Questo programma trunca (svuota) i file specificati da linea di comando senza modificarne i timestamp 
+di accesso e modifica, ripristinandoli dopo l’operazione con futimens().
+
+Esempio 4.22 -> apue.3e/filedir/ftw8.c
+Questo programma è una versione personalizzata di ftw(3) (file tree walk): attraversa ricorsivamente 
+una gerarchia di directory, conteggiando e classificando i tipi di file trovati (file regolari, directory, 
+link simbolici, socket, ecc.).
+
+
+Capitolo 8: Programmi e processi
+
+
+- Esempio 1.7 -> apue.3e/intro/shell1.c (pag 71)
+Esegue una shell utilizzando le funzioni fork(), execlp() e waitpid()
+
+
+
+- Esempio 7.3 -> apue.3e/environ/doatexit.c (Pag 74)
+Registra 3 funzioni da eseguire al termine del programma usando la funzione atexit()
+
+
+- File memory_dump.c -> ./memory_dump.c (pagg. 75-80)
+Ordina gli indirizzi di memoria delle variabili d'ambiente, di variabili locali, statiche e di funzioni tramite 
+una pipe e li stampa. Verifica inoltre che la variabile d'ambiente "TERM" non sia stata modificata, 
+altrimenti stampa il valore aggiornato
+
+
+- Esempio 7.16 -> apue.3e/environ/getrlimit.c (pag 81)
+Prende in ingresso una risorsa e il suo nome, usa la funzione getrlimit() per ottenere i limiti corrente 
+e massimo di quella risorsa e li stampa
+
+
+- Esempio 8.5 -> apue.3e/lib/prexit.c (pag 84)
+Funzione che prende in ingresso lo stato di un processo e stampa lo l'exit status e/o il signal number
+in caso di interruzione di tale processo tramite segnale
+
+
+- Esempio 8.6 -> apue.3e/proc/wait1.c  (pagg. 84-85)
+Genera tre processi figli e li termina in modi diversi per testare i vari casi previsti dalla funzione pr_exit() 
+dell'esempio 8.5 nel file prexit.c
+
+
+- Esempio 8.8 -> apue.3e/proc/fork2.c  (pagg. 85-86)
+Si genera un processo figlio e questo primo figlio genera un suo processo figlio. 
+Il primo figlio termina lasciando il secondo figlio orfano e si stampa il PPID del secondo figlio, il quale darà 
+come risultato 1, ossia il PID di init. Il processo parent termina dopo la terminazione del primo figlio
+
+
+- Esempio 8.12 -> apue.3e/proc/tellwait1.c (Pag 87)
+Si genera un processo figlio, successivamente, processo parent e processo figlio cercano di scrivere concorrentemente 
+sullo standard output "output from parent" e "output from child". L'output potrebbe apparire interlacciato
+
+
+- Esempio 8.13 -> apue.3e/proc/tellwait2.c (pag 88)
+Corregge l'esempio 8.12 (tellwait1.c) usando le funzioni TELL_WAIT(), WAIT_PARENT() e TELL_CHILD(pid) in modo tale da 
+evitare eventuali interlacciamenti dell'output. PS. A volte la stampa del prompt del terminale si interlaccia all'output del
+child (ipotesi: il termine del processo parent causa la stampa del prompt prima che termini il processo figlio)
+
+
+- Esempio 8.16 -> apue.3e/proc/exec1.c (pag 90)
+Mostra due esempi di utilizzo di execle ed execlp per spiegarne le differenze, la prima ha bisogno del percorso del comando da eseguire e 
+che gli venga passato un vettore di variabili d'ambiente. 
+La seconda usa la variabile PATH per trovare il comando da eseguire e usa le variabili d'ambiente correnti del sistema
+
+
+- Esempio 8.31 -> apue.3e/proc/times1.c (pag 94)
+Usa la funzione system() in un loop per eseguire un elenco di comandi passati da terminale e per ogni comando eseguito misura 
+i tempi con la funzione times() : reale, tempo utente, tempo sistema, tempo utente dei figli e tempo sistema dei figli
+
+
+
+Capitolo 9: Segnali
+
+
+- Esempio 1.10 -> apue.3e/intro/shell2.c (pag 97)
+Modifica all'esempio 1.7 (shell1.c) per gestire il segnale SIGINT attraverso la funzione signal()
+
+
+
+- Esempio 10.2 -> apue.3e/signals/sigusr.c (pag 98)
+Usa la funzione signal() per gestire la ricezione dei segnali SIGUSR1 e SIGUSR2 con un unico gestore
+
+
+- Esempio alarm -> apue.3e/signals/esercizio_alarm.c (pag 102)
+Gestisce il segnale SIGALRM con la fuzione signal() e imposta un allarme di 10 secondi con la funzione alarm(), 
+nel frattempo fa delle moltiplicazioni in un loop infinito e conta quante moltiplicazioni fa. 
+Allo scattare dell'allarme interrompe il loop e stampa a schermo il numero di moltiplicazioni effettuate
+
+
+- Esempio 10.7 -> apue.3e/signals/esercizio_alarm.c (pag 103)
+Funzione che simula l'effetto della funzione sleep() usando la funzione alarm() e gestendo il segnale SIGALRM per interrompere 
+l'effetto della funzione pause()
+
+
+- Esempio 10.14 -> apue.3e/lib/prmask.c (pag 105)
+Funzione che stampa i nomi dei segnali contenuti nella signal mask del processo chiamante mantenendo invariato il valore di errno
+
+
+
+- Esempio 10.15 -> apue.3e/signals/critical.c (pag 107)
+Usa le funzioni sigemptyset(), sigaddset() e sigprocmask() per mettere in attesa un eventuale segnale SIGQUIT ricevuto. 
+Successivamente, verifica la ricezione di SIGQUIT con le funzioni sigpending() e sigismember() e lo sblocca con sigprocmask(). 
+L'effetto di SIGQUIT viene gestito con la funzione signal() e poi viene ripristinato con signal(SIGQUIT, SIG_DFL)
+
+
+- Esempio sigusr1.c -> ./sigusr1.c (Pag 109)
+Usa la funzione sigaction() invece della funzione signal() per impostare un gestore del segnale SIGUSR1 che aumenta
+il valore di un contatore globale. Inizializza a 0 una struct sigaction con la funzione memset() e alla fine stampa 
+il conteggio delle ricezioni di SIGUSR1
+
+
+
+- Esempio 10.22 -> apue.3e/signals/suspend1.c (pag 111)
+Inserisce SIGINT nella mask del processo e usa la funzione sigsuspend() sospendendo il processo fino alla ricezione di un qualunque segnale 
+(anche quelli presenti nella mask come SIGINT) tranne SIGUSR1. Usa la funzione pr_mask() presente nella libreria apue.3e/lib/prmask.c per stampare
+la mask del processo più volte
+
+
+
+- Esempio 10.23 -> apue.3e/signals/suspend2.c (pag 112)
+Usa signal() per gestire SIGINT e SIGQUIT. Aggiunge SIGQUIT alla mask con sigprocmask(). Se riceve SIGINT si effettua una stampa a schermo, 
+se riceve SIGQUIT si imposta a 1 un flag globale. Finche il flag è a 0 il processo è sospeso in un while che chiama una sigsuspend() 
+che accetta qualunque segnale. Alla fine viene ripristinata la vecchia mask.
+
+
+
+Capitolo 10: Threads
+
+
+- Esempio 11.2 -> apue.3e/threads/threadid.c (pag 117)
+Stampa l'id del processo e del main thread, poi crea un nuovo thread e stampa nuovamente l'id del processo e del thread. 
+Nella seconda stampa l'id del processo non cambia mentre quello del thread sì.
+
+
+- Esempio 11.3 -> apue.3e/threads/exitstatus.c  (pag 119)
+Crea due thread che effettuano una stampa a schermo e ritornano rispettivamente 1 e 2 al main thread (il primo con return() 
+e il secondo con pthread_exit()). Il main thread attende il ritorno dei due thread tramite la funzione pthread_join().
+
+
+- Esempio thread_incr.c -> tlpi-dist/threads/thread_incr.c (pagg. 120-121)
+Crea due thread che accedono contemporaneamente ad una variabile globale intera e la incrementano 100'000'000 di volte ciascuno 
+in un loop (oppure argv[1] volte se lo si passa da terminale). Dalle diverse esecuzioni è possibile osservare che glob assume sempre valori 
+diversi in quanto viene sovrascritta dal thread che inizia dopo.
+
+
+- Esempio thread_incr_mutex.c -> tlpi-dist/threads/thread_incr_mutex.c (pag 123)
+Corregge thread_incr.c bloccando l'accesso multiplo alla variabile glob usando un mutex. In questo modo, quando il primo thread finisce 
+di incrementare glob, sblocca il mutex e il secondo thread può iniziare ad incrementare glob. Al termine dell'intero processo il valore di 
+glob sarà 200'000'000 (oppure 2 * argv[1]).
+
+
+- Esempio prod_no_condvar.c -> tlpi-dist/threads/prod_no_condvar.c (pagg. 128-129)
+Prende da terminale degli interi non negativi e crea un thread "produttore" per ognuno di questi numeri. Il j-esimo thread "produttore" incrementa 
+di 1 una variabile globale "avail", tante volte quante dice argv[j] accedendovi tramite mutex. Intanto un altro thread "consumatore" controlla 
+continuamente se "avail" è maggiore di zero, in quel caso decrementa "avail" (sempre tramite mutex) e incrementa una variabile locale "numConsumed" 
+finchè "avail" non arriva a 0. A quel punto viene sbloccato il mutex e gli altri thread produttori lo possono aumentare di nuovo. Il ciclo termina 
+quando tutti i produttori hanno incrementato avail di argv[j] volte e quando il thread consumatore avrà decrementato avail a 0 e incrementato numConsumed 
+di tutti gli argv[j]. Ad ogni incremento di numConsumed si stampa il tempo impiegato e il valore di numConsumed.
+
+
+- Esempio prod_condvar.c -> tlpi-dist/threads/prod_condvar.c (pagg. 130-131)
+Variante di prod_no_condvar.c che usa una condition variable per segnalare al thread consumatore che la variabile globale "avail" è stata 
+incrementata, in questo modo, il consumatore, non ha bisogno di controllare continuamente ma usa la funzione pthread_cond_wait() 
+per ricevere il segnale.
+
+
+- Esempio ATEST22TLS.c -> ./ATEST22TLS (pagg. 135-136)
+Esempio di utilizzo del Thread-Local Storage. Inizializza un certo numero di thread, i quali modificano delle variabili globali dichiarate 
+con la parola chiave __thread che garantisce che ogni thread avrà una copia locale di tali variabili. Ogni thread stampa tali valori a schermo e 
+possiamo osservare che ogni thread stamperà dei valori diversi.
+
+
+- Esempio 12.16 -> apue.3e/threadctl/suspend.c (pag 140)
+Utilizzo dei segnali con i thread. Si modifica la mask dei segnali dei thread con pthread_sigmask(). Si crea un thread secondario che ha 
+il compito di attendere i segnali SIGINT e/o SIGQUIT. Il thread principale resta in attesa con una condition variable (pthread_cond_wait()) che il 
+thread secondario riceva un segnale SIGQUIT, modifichi la variabile quitflag e notifichi tale modifica con pthread_cond_signal(). Infine viene resettata 
+la vecchia maschera dei segnali con sigprocmask().
+
+
+Capitolo 11 (Daemon Process)
+
+Esempio 13.1 -> apue.3e/daemons/init.c   (Pag 144)
+Il programma rende un processo un demone Unix usando funzioni come fork, setsid, chdir, close e openlog 
+per scollegarlo dal terminale, reindirizzare gli output e inizializzare il logging.
+
+Esempio 13.6 -> apue.3e/daemons/single.c (Pag 147)
+Il programma verifica se un'istanza del demone è già in esecuzione, usando un file di lock (/var/run/daemon.pid) 
+e funzioni come open, lockfile, ftruncate e write per gestire il file PID e impedire duplicati.
+
+Esempio 13.6 -> apue.3e/daemons/reread.c (Pag 149)
+Il programma dimostra come un demone possa rileggere il proprio file di configurazione tramite la gestione del segnale SIGHUP.
+
+
+Capitolo 12 (Advanced I/O)
+
+Esempio 14.1 -> apue.3e/advio/nonblockw.c  (Pag 153)
+Il programma legge dati da stdin e li scrive su stdout in modalità non bloccante, 
+mostrando quanti byte sono scritti a ogni ciclo, anche in caso di errore o blocco temporaneo.
+
+Esempio lock2.c -> RecordLocking/lock2.c (Pag 155)
+Il programma simula un meccanismo di lock tramite file, in cui un processo tenta di ottenere accesso 
+esclusivo creando un file (/tmp/LCK.test2) con il flag O_EXCL, e se il file esiste già, aspetta e riprova.
+
+Esempio lock3.c -> RecordLocking/lock3.c (Pag 156)
+Il programma dimostra l'uso di lock su porzioni di file tramite fcntl, applicando un lock condiviso (lettura)
+su una regione e un lock esclusivo (scrittura) su un'altra, per poi mantenerli attivi per 60 secondi.
+
+Esempio lock4.c -> RecordLocking/lock4.c (Pag 158)
+Il programma verifica se determinate regioni di un file sono già bloccate da altri processi, provando sia lock esclusivi
+(F_WRLCK) che condivisi (F_RDLCK), e stampa i dettagli se la richiesta fallirebbe.
+ 
+Esempio lock5.c -> RecordLocking/lock5.c (Pag 159)
+Questo programma dimostra l'uso dei file lock posizionali tramite fcntl() per bloccare o sbloccare specifiche regioni di un file, 
+sia in modalità non bloccante (F_SETLK) che bloccante (F_SETLKW). Simula scenari di accesso concorrente a file.
+
+Esempio SelectServer.c -> /NetworkingCodeExamples/11-Select/SelectServer.c (Pag 162)
+Questo programma mostra un server che gestisce contemporaneamente connessioni TCP e UDP usando I/O multiplexing con select(), monitorando:
+
+- il socket TCP in ascolto per nuove connessioni,
+
+- i socket TCP accettati per i messaggi dai client,
+
+- il socket UDP per datagrammi in arrivo,
+
+il tutto in modo protocol-independent e senza multithreading, grazie all’uso di select() per controllare più socket simultaneamente in un solo ciclo.
+
+
+Capitolo 13 (Interprocess Communication)
+
+Esempio pipe2.c -> ch13/pipe2.c (Pag 169)
+Questo programma dimostra l’uso di pipe e fork per far comunicare due processi (genitore e figlio).
+
+Esempio pipe3.c -> ch13/pipe3.c (Pag 170)
+Questo programma è una variazione di un classico esempio di comunicazione tramite pipe con l'aggiunta 
+dell'uso di execl() per eseguire un nuovo programma nel processo figlio.
+
+Esempio pipe4.c -> ch13/pipe4.c (Pag 170)
+Il programma è un esempio di utilizzo delle pipe in un contesto in cui il file descriptor
+viene passato come argomento dalla riga di comando.
+
+Esempio pipe5.c -> ch13/pipe5.c (Pag 171)
+Questo programma mostra una tecnica classica per redirigere l’input standard (stdin) verso una pipe, 
+in modo che un altro programma (in questo caso od -c) legga i dati dalla pipe come se arrivassero da stdin.
+
+Esempio pipe_ls_wc.c -> tlpi-dist/pipes/pipe_ls_wc.c (Pag 172)
+Questo programma dimostra come collegare due processi figli tramite una pipe: uno esegue ls e l’altro wc -l. 
+L’obiettivo è simulare la shell: ls | wc -l
+
+Esempio (non presente su appunti) -> tlpi-dist/pshm/pshm_create.c 
+Questo programma crea un oggetto di memoria condivisa POSIX con un nome, dimensione e permessi specificati, e lo mappa nello spazio di indirizzamento del processo chiamante.
+
+Esempio (non presente su appunti) -> tlpi-dist/pshm/pshm_read.c
+Questo programma apre un oggetto di memoria condivisa POSIX esistente, lo mappa in sola lettura nello spazio del processo e ne stampa il contenuto su stdout.
+
+Esempio (non presente su appunti) -> tlpi-dist/pshm/pshm_unlink.c
+Questo programma rimuove (unlink) un oggetto di memoria condivisa POSIX identificato dal nome fornito come argomento.
+
+Esempio (non presente su appunti) -> tlpi-dist/pshm/pshm_write.c
+Questo programma apre un oggetto di memoria condivisa POSIX esistente, lo ridimensiona per contenere una stringa fornita da riga di comando e copia tale stringa nella memoria condivisa.
+
+Esempio psem_create.c -> tlpi-dist/psem/psem_create.c (Pag 180)
+Questo programma (psem_create.c) permette di creare un semaforo POSIX con nome, usando la funzione sem_open. 
+È uno strumento utile per testare e comprendere l’uso dei semafori tra processi (interprocess synchronization).
+
+Esempio sem1.c -> Semafori/sem1.c (Pag 182)
+Il programma dimostra come due processi (eseguendo lo stesso binario, uno con e uno senza argomenti) si sincronizzano 
+usando un semaforo per accedere a una sezione critica. Ogni processo stampa un carattere ('X' o 'O') alternandosi 
+correttamente, evitando race condition.
+
+Esempio shm1.c -> Semafori/shm1.c (pag 185)
+Il programma è un consumer che legge da un segmento di memoria condivisa. Lavora in coppia con un producer che scrive 
+dati nello stesso segmento.
+La comunicazione è basata su una struttura shared_use_st, contenente:
+- un flag (written_by_you) per indicare se è stato scritto un nuovo messaggio,
+- un buffer testuale (some_text) contenente il messaggio.
+
+Esempio shm2.c -> Semafori/shm2.c (Pag 187)
+Il programma shm_producer scrive input dell’utente in una memoria condivisa System V per inviarlo a un 
+processo consumatore, sincronizzando l’accesso tramite una variabile di controllo.
+
+
+Capitolo 14 (Network Programming)
+
+Esempio SocketAddresses.c -> NetworkingCodeExamples/01- SocketAddress/SocketAddresses.c (Pag 194)
+Questo programma mostra come inizializzare, convertire e visualizzare indirizzi IPv4, IPv6 e IPv4-mapped-IPv6 
+usando le funzioni inet_pton() e inet_ntop(), gestendo correttamente il Network Byte Order per IP e numeri di porta.
+
+Esempio TCPServer.c -> NetworkingCodeExamples/02- TCP-IPv4-basic/TCPServer.c (Pag 200)
+Il programma implementa un server TCP/IPv4 che accetta connessioni da client, riceve messaggi e li restituisce (echo),
+fino a chiusura della connessione da parte del client.
+
+Esempio TCPClient.c -> NetworkingCodeExamples/02- TCP-IPv4-basic/TCPClient.c (Pag 200)
+Questo codice implementa un client TCP/IPv4 che si connette a un server echo, invia 20 messaggi e stampa le risposte ricevute.
+
+Esempio UDPServer.c -> NetworkingCodeExamples/04- UDP-IPv4-Basic/UDPServer.c (Pag 202)
+Il codice implementa un server UDP IPv4 che riceve messaggi da qualsiasi client, 
+li stampa e li rispedisce indietro come echo in un ciclo infinito.
+
+Esempio UDPClient.c -> NetworkingCodeExamples/04- UDP-IPv4-Basic/UDPClient.c (Pag 202)
+Il codice implementa un client UDP IPv4 che invia un messaggio a un server specificato tramite indirizzo IP (convertito con 
+inet_pton()), riceve l'eco del messaggio dal server e lo stampa, poi termina.
+
+Esempio showip.c -> Beej's Guide to Network (fai un find all'interno del file, inserendo un nome del programma) (Pag 202)
+Il programma prende come argomento un hostname da linea di comando, utilizza getaddrinfo() per ottenere una lista di
+indirizzi IP associati (sia IPv4 che IPv6), e poi stampa tutti gli indirizzi IP trovati in formato leggibile, 
+distinguendo tra IPv4 e IPv6.
+
+Esempio server.c -> Beej's Guide to Network (fai un find all'interno del file, inserendo un nome del programma) (Pag 202)
+Il codice che hai postato è un tipico esempio di server TCP in C che accetta connessioni e invia un messaggio "Hello, world!"
+ai client connessi. 

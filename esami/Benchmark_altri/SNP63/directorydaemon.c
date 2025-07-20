@@ -522,11 +522,12 @@ int main(int argc, char *argv[]){
     }
 
     printf("Scansionando directory iniziale: %s\n", monitor_directory);
+    
     all_file_inpath(monitor_directory);  /* Popola la lista */
 
 
     /*Verifichiamo che il daemon e' gia in esecuzione*/
-    if(is_already_running(PIDFILE)){
+    if(is_already_running(PIDFILE)) {
         fprintf(stderr, "Errore, daemon gia in esecuzione\n");
         exit(1);
     }

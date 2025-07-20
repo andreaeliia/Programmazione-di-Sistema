@@ -63,7 +63,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
     
-    if (listen(server_fd, 5) < 0) {
+    if (listen(server_fd, ) < 0) {
         perror("listen failed");
         exit(EXIT_FAILURE);
     }

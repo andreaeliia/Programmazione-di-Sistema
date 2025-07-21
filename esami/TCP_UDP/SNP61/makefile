@@ -1,4 +1,4 @@
-ROOT="/mnt/c/Users/recre/Programmazione di Sistema/SNP2024/apue.3e"
+ROOT="/mnt/c/Users/recre/Programmazione-di-Sistema/Programmazione di Sistema/SNP2024/apue.3e"
 SRC=client.c
 SRC2=server.c
 BIN=$(basename $(SRC))

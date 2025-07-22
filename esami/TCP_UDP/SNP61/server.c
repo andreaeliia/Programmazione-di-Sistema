@@ -52,9 +52,43 @@ I due programmi non devono usare le chiamate system() e popen().*/
 long long size_limit;
 
 
+typedef struct{
+	char **file_paths;
+	int end;
+	int file_count;
+	int capacity;
+}path_list;
+
+/*========================Struct function=============*/
+path_list* init_path_list(){
+	path_list* list = malloc(sizeof(path_list));
+	list->file_paths = malloc(3000*sizeof(char*));
+	list->end = 0;
+	list->file_count = 0;
+	list->capacity = 3000;
+
+	return list;
+}
+
+
+void add_file(path_list* list,const char* pathname){
+
+
+
+
+	if(list->file_count >= list->capacity){
+		list->capacity *=2;
+		list->file_paths = realloc(list->file_paths,list->capacity * sizeof(char*));
+	}
+	list->file_paths[list->file_count] =  malloc(strlen(pathname)+1);
+	strcpy(list->file_paths[list->file_count],pathname);
+	list->file_count++;
+
+}
+
 /*==============SERVER UDP================*/
 
-int send_udp(int server_fd,sockaddr_in client_addr,socklen_t client_len,char* pathname){
+int send_udp(int server_fd,struct sockaddr_in client_addr,socklen_t client_len,char* pathname){
 		
 		char response[BUFFER_SIZE];
         snprintf(response, BUFFER_SIZE, "%s", pathname);
@@ -69,20 +103,27 @@ int send_udp(int server_fd,sockaddr_in client_addr,socklen_t client_len,char* pa
 	}
 
 
+
+
+
 /*========================ESEMPI COPIATi=====================*/
 /* function type that is called for each filename */
 typedef	int Myfunc(const char *, const struct stat *, int);
 
 static Myfunc	myfunc;
-static int		myftw(char *, Myfunc *);
-static int		dopath(Myfunc *);
+static int		myftw(char *, Myfunc *,path_list*);
+static int		dopath(Myfunc *,path_list*);
 
 
 
-void file_in_path(char* pathname) {
+path_list* file_in_path(char* pathname) {
     int ret;
 
-    ret = myftw(pathname, myfunc);  /* Questo ora popola anche la lista! */
+
+	path_list* list;
+
+	list = init_path_list();
+    ret = myftw(pathname, myfunc,list);  /* Questo ora popola anche la lista! */
 
    
     
@@ -90,6 +131,10 @@ void file_in_path(char* pathname) {
     if (ret != 0) {
         err_quit("Errore durante la scansione della directory");
     }
+
+	add_file(list,"end");
+
+	return list;
 }
 /*
  * Descend through the hierarchy, starting at "pathname".
@@ -100,11 +145,20 @@ void file_in_path(char* pathname) {
 #define	FTW_DNR	3		/* directory that can't be read */
 #define	FTW_NS	4		/* file that we can't stat */
 
+
+/*
+	define per i return value
+
+*/
+#define CONTINUE_SCAN 0
+#define FILE_FOUND    2
+#define ERROR_STOP   -1
+
 static char	*fullpath;		/* contains full pathname for every file */
 static size_t pathlen;
 
 static int					/* we return whatever func() returns */
-myftw(char *pathname, Myfunc *func)
+myftw(char *pathname, Myfunc *func,path_list* list)
 {
 	fullpath = path_alloc(&pathlen);	/* malloc PATH_MAX+1 bytes */
 										/* ({Prog pathalloc}) */
@@ -114,7 +168,7 @@ myftw(char *pathname, Myfunc *func)
 			err_sys("realloc failed");
 	}
 	strcpy(fullpath, pathname);
-	return(dopath(func));
+	return(dopath(func,list));
 }
 
 /*
@@ -123,28 +177,44 @@ myftw(char *pathname, Myfunc *func)
  * call func(), and return.  For a directory, we call ourself
  * recursively for each name in the directory.
  */
-static int					/* we return whatever func() returns */
-dopath(Myfunc* func)
+
+static int dopath(Myfunc* func, path_list* list)
 {
 	struct stat		statbuf;
 	struct dirent	*dirp;
 	DIR				*dp;
 	int				ret, n;
 
-	if (lstat(fullpath, &statbuf) < 0)	/* stat error */
-		return(func(fullpath, &statbuf, FTW_NS));
-	if (S_ISDIR(statbuf.st_mode) == 0)	/* not a directory */
-		return(func(fullpath, &statbuf, FTW_F));
+	if (lstat(fullpath, &statbuf) < 0) {
+		ret = func(fullpath, &statbuf, FTW_NS);
+		if (ret == FILE_FOUND) {
+			return CONTINUE_SCAN;
+		} else {
+			return ret;
+		}
+	}
+	
+	if (S_ISDIR(statbuf.st_mode) == 0) {
+		ret = func(fullpath, &statbuf, FTW_F);
+		if (ret == FILE_FOUND) {
+			add_file(list, fullpath);  /* Aggiungi il file alla lista! */
+			return CONTINUE_SCAN;      /* Continua la scansione */
+		}
+		return ret;
+	}
 
-	/*
-	 * It's a directory.  First call func() for the directory,
-	 * then process each filename in the directory.
-	 */
-	if ((ret = func(fullpath, &statbuf, FTW_D)) != 0)
-		return(ret); /*Errore */
+	/* È una directory */
+	ret = func(fullpath, &statbuf, FTW_D);
+	if (ret != 0) {
+		if (ret == FILE_FOUND) {
+			/* Non dovrebbe succedere per le directory, ma gestiamo il caso */
+			return CONTINUE_SCAN;
+		}
+		return ret;
+	}
 
 	n = strlen(fullpath);
-	if (n + NAME_MAX + 2 > pathlen) {	/* expand path buffer */
+	if (n + NAME_MAX + 2 > pathlen) {
 		pathlen *= 2;
 		if ((fullpath = realloc(fullpath, pathlen)) == NULL)
 			err_sys("realloc failed");
@@ -152,24 +222,33 @@ dopath(Myfunc* func)
 	fullpath[n++] = '/';
 	fullpath[n] = 0;
 
-
-	if ((dp = opendir(fullpath)) == NULL)	/* can't read directory */
-		return(func(fullpath, &statbuf, FTW_DNR));
+	if ((dp = opendir(fullpath)) == NULL) {
+		ret = func(fullpath, &statbuf, FTW_DNR);
+		if (ret == FILE_FOUND) {
+			return CONTINUE_SCAN;
+		} else {
+			return ret;
+		}
+	}
 
 	while ((dirp = readdir(dp)) != NULL) {
-		if (strcmp(dirp->d_name, ".") == 0  ||
-		    strcmp(dirp->d_name, "..") == 0)
-				continue;		/* ignore dot and dot-dot */
-		strcpy(&fullpath[n], dirp->d_name);	/* append name after "/" */
-		if ((ret = dopath(func)) != 0)		/* recursive */
-			break;	/* time to leave */
+		if (strcmp(dirp->d_name, ".") == 0  || strcmp(dirp->d_name, "..") == 0)
+				continue;
+		strcpy(&fullpath[n], dirp->d_name);
+		ret = dopath(func, list);  /* Passa la lista ricorsivamente */
+		if (ret != 0) {/*time to leave*/
+			break;
+		}
+	
 	}
-	fullpath[n-1] = 0;	/* erase everything from slash onward */
+	fullpath[n-1] = 0;
+	
 
 	if (closedir(dp) < 0)
 		err_ret("can't close directory %s", fullpath);
-	return(ret);
+	return ret;
 }
+
 
 static int
 myfunc(const char *pathname, const struct stat *statptr, int type)
@@ -181,23 +260,25 @@ myfunc(const char *pathname, const struct stat *statptr, int type)
 		
             printf("%s\n",pathname);
 			printf("----------------\n");
-			return 0;
+			return FILE_FOUND;
         }
 	
 		break;
 	case FTW_D:
-		return -1;
+		return CONTINUE_SCAN;
 		
 	case FTW_DNR:
-		return -1;
-		
+		err_ret("can't read directory %s", pathname);
+		return CONTINUE_SCAN;
+		break;
 	case FTW_NS:
-		
-		return -1;
+		err_ret("stat error for %s", pathname);
+		return CONTINUE_SCAN;
+		break;
 	default:
-		err_dump("unknown type %d for pathname %s\n", type, pathname);
+		err_dump("unknown type %d for pathname %s", type, pathname);
 	}
-	return(0);
+	return CONTINUE_SCAN;
 }
 
 
@@ -206,6 +287,8 @@ int main() {
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
     char buffer[BUFFER_SIZE];
+	path_list* list;
+	int i;
 
     
     /* 1. Crea socket UDP */
@@ -229,9 +312,9 @@ int main() {
     }
     
     printf("Server UDP in ascolto sulla porta %d\n", PORT);
-    
-    /* 4. Loop principale */
+	/* 4. Loop principale */
         while (1) {
+		
         /* Ricevi messaggio */
         int bytes_received = recvfrom(server_fd, buffer, BUFFER_SIZE - 1, 0,
                                      (struct sockaddr*)&client_addr, &client_len);
@@ -249,18 +332,22 @@ int main() {
         
         /*Prendere il numero dal buffer*/
         size_limit = atoll(buffer);
-		
+			
 
 		
         /*Qua mettere la parte di trovare il mnt*/
-        file_in_path("/mnt/c/Users/recre/Programmazione-di-Sistema");
+        list = file_in_path("/mnt/c/Users/recre/Programmazione-di-Sistema");
 
         /* Invia risposta */
-        char response[BUFFER_SIZE];
-        snprintf(response, BUFFER_SIZE, "Echo: %s", buffer);
-        
-        sendto(server_fd, response, strlen(response), 0,
-               (struct sockaddr*)&client_addr, client_len);
+
+
+        for ( i = 0; i <= list->file_count-1; i++)
+		{
+			send_udp(server_fd,client_addr,client_len,list->file_paths[i]);
+
+			sleep(1);
+		}
+		
         
 	}
 

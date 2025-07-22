@@ -48,12 +48,22 @@ int main() {
                (struct sockaddr*)&server_addr, sizeof(server_addr));
         
         /* Ricevi risposta */
-        int bytes_received = recvfrom(client_fd, response, BUFFER_SIZE - 1, 0,
-                                     NULL, NULL);
+        while (1)
+        {
         
-        if (bytes_received > 0) {
-            response[bytes_received] = '\0';
-            printf("Risposta server: %s\n", response);
+            int bytes_received = recvfrom(client_fd, response, BUFFER_SIZE - 1, 0,
+                                        NULL, NULL);
+            
+
+            if(strcmp(response,"end\n")==0){
+                printf("%s\n", response);
+                break;
+
+            }                            
+            if (bytes_received > 0) {
+                response[bytes_received] = '\0';
+                printf("%s\n", response);
+            }
         }
     }
     

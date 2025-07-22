@@ -1,0 +1,77 @@
+[Attenzione: questo è un testo codificato in UTF-8]
+
+Creare nella propria home su hplinux3.unisalento.it una directory
+denominata proprioaccount.esameSNP59 (es.franco.esameSNP59) e svolgere
+l'esercizio in tale directory o, in alternativa, creare una directory
+con lo stesso nome nella propria home macOS, svolgere gli esercizi in
+tale directory e, alla fine della prova, trasferirla nella propria home
+su hplinux3.unisalento.it.
+
+I programmi creati devono essere eseguibili sia su macOS che su Linux.
+Nella directory si DEVE anche creare un file di nome "leggimi.txt" che
+descriva l'impostazione adottata per le soluzioni oltre ad eventuali
+commenti e/o osservazioni. Si fa presente che il contenuto di tale file
+permette spesso una migliore comprensione della logica seguita nello
+svolgimento e, di conseguenza, la sua presenza va a tutto vantaggio
+dell'esaminando.
+
+Aggiungere all'inizio di qualsiasi file creato una riga di commento
+contenente il proprio cognome, nome e numero di matricola.
+
+Alla fine, copiare, incollare ed eseguire, in un terminale con il quale
+si sia acceduto al proprio account Linux, la seguente linea di comando:
+
+cd; tar cvfz $USER.esameSNP59.tgz $USER.esameSNP59
+
+[ATTENZIONE: dare il comando qui sopra indicato nello shell eseguito
+sulla macchina Linux, DOPO che la cartella proprioaccount.esameSNP59 è
+stata trasferita sulla propria home su hplinux3.unisalento.it e NON
+mentre è ancora nella propria home su macOS (se in essa si è lavorato).]
+
+Esercizio
+
+Implementare nel linguaggio C il seguente esperimento:
+
+Un processo genera una sequenza di un milione di numeri interi casuali e
+la trasferisce ad un altro processo. Confrontare i tempi necessari al
+trasferimento impiegando tre metodi differenti: 1) una unnamed pipe, 
+2) un trasferimento TCP eseguito localmente, 3) una memoria condivisa.
+
+
+
+English translation:
+
+Create a directory in your home on hplinux3.unisalento.it
+named yourownaccount.esameSNP59 (ex.franco.esameSNP59) and carry out
+the exercises in that directory or, alternatively, create a directory
+with the same name in your macOS home, carry out the exercises in
+this directory and, at the end of the test, transfer it to your home
+on hplinux3.unisalento.it.
+
+The created programs must be executable on both macOS and Linux.
+In the directory you MUST also create a file named "readme.txt" which
+describes the choices made for the solutions as well as any
+comments and/or observations. Please note that the content of this file
+often allows a better understanding of the logic followed in the
+progress and, consequently, his presence is to the full advantage
+of the examinee.
+
+Add a comment line to the beginning of any created file
+containing your surname, first name and registration number.
+
+Finally, copy, paste and run, in a terminal open into your Linux account, 
+the following command line:
+
+cd; tar cvfz $USER.esameSNP59.tgz $USER.esameSNP59
+
+[WARNING: issue the above command in a shell executed
+on the Linux machine, AFTER the yourownaccount.examSNP59 folder is
+been transferred to your home on hplinux3.unisalento.it and NOT
+while still in your home on macOS (if you've worked there).]
+
+Implement the following experiment in the C language:
+
+A process generates a sequence of one million random integers and passes
+it to another process. Compare the times required for the transfer
+using three different methods: 1) an unnamed pipe, 2) a TCP transfer
+performed within the localhost, 3) a shared memory.
